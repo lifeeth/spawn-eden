@@ -41,9 +41,47 @@ def setup_eden():
                     "cherokee",
                     "libcherokee-mod-rrd",
                     "libxml2-dev"])
-    #user_ensure("web2py")
-    #with cd("/home/web2py"):
-    #    run('bzr checkout --lightweight -r 3430 lp:~mdipierro/web2py/devel web2py')
-    #with cd("/home/web2py/web2py/applications"):
-    #    run('bzr checkout --lightweight lp:sahana-eden eden')
-    #run('chown -R web2py: /home/web2py')
+
+    with settings(warn_only=True):
+        run('useradd -M web2py')
+
+    with cd('/home'): # Pull Web2py
+        with settings(warn_only=True):
+            run('git clone git://github.com/mdipierro/web2py.git')
+        put('configs/routes.py','/home/web2py/')
+
+    with cd('/home/web2py/applications'): #Eden setup
+        with settings(warn_only=True):
+            run('git clone git://github.com/flavour/eden.git')
+            run('chown web2py /home/web2py')
+            run('mkdir -p admin/cache')
+            run('chown web2py admin/cache')
+            run('chown web2py admin/cron')
+            run('mkdir -p admin/databases')
+            run('chown web2py admin/databases')
+            run('mkdir -p admin/errors')
+            run('chown web2py admin/errors')
+            run('mkdir -p admin/sessions')
+            run('chown web2py admin/sessions')
+            run('chown web2py eden')
+            run('mkdir -p eden/cache')
+            run('chown web2py eden/cache')
+            run('chown web2py eden/cron')
+            run('mkdir -p eden/databases')
+            run('chown web2py eden/databases')
+            run('mkdir -p eden/errors')
+            run('chown web2py eden/errors')
+            run('chown web2py eden/models')
+            run('mkdir -p eden/sessions')
+            run('chown web2py eden/sessions')
+            run('chown web2py eden/static/img/markers')
+            run('mkdir -p eden/static/cache/chart')
+            run('chown web2py -R eden/static/cache')
+            run('mkdir -p eden/uploads')
+            run('chown web2py eden/uploads')
+            run('mkdir -p eden/uploads/gis_cache')
+            run('mkdir -p eden/uploads/images')
+            run('mkdir -p eden/uploads/tracks')
+            run('chown web2py eden/uploads/gis_cache')
+            run('chown web2py eden/uploads/images')
+            run('chown web2py eden/uploads/tracks')
