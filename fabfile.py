@@ -41,7 +41,11 @@ def setup_eden():
                     "build-essential",
                     "cherokee",
                     "libcherokee-mod-rrd",
-                    "libxml2-dev"])
+                    "libxml2-dev",
+                    "postgresql-8.4",
+                    "python-psycopg2",
+                    "postgresql-8.4-postgis",
+                    "ptop"])
 
     with settings(warn_only=True):
         run('useradd -M web2py')
@@ -103,3 +107,7 @@ def setup_eden():
         run('update-rc.d uwsgi defaults')
 
 
+    run('cp /etc/cherokee/cherokee.conf /etc/cherokee/cherokee.conf.bak') #Cherokee configs
+    put('configs/cherokee.conf','/etc/cherokee/cherokee.conf')
+    put('configs/maintenance.html','/var/www/maintenance.html')
+    run('/etc/init.d/cherokee restart')
