@@ -6,7 +6,7 @@ from cuisine import *
 def init_env():
     run('apt-get -y update')
     run('apt-get -y upgrade')
-    run('apt-get -y install aptitude sudo') # So that Cuisine plays nice
+    run('apt-get -y install aptitude sudo curl') # So that Cuisine plays nice
     package_update()
 
 def setup_eden():
@@ -27,7 +27,7 @@ def setup_eden():
                     "python2.6",
                     "python-dev",
                     "ipython",
-                    "pyhton-lxml",
+                    "python-lxml",
                     "python-setuptools",
                     "python-shapely",
                     "python-dateutil",
