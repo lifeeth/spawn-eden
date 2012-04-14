@@ -15,6 +15,7 @@ def setup_eden():
     run('curl http://apt.balocco.name/key.asc | apt-key add -')
     run('apt-get -y update')
     package_ensure(["unzip",
+                    "wget",
                     "psmisc",
                     "mlocate",
                     "lrzsz",
@@ -85,3 +86,20 @@ def setup_eden():
             run('chown web2py eden/uploads/gis_cache')
             run('chown web2py eden/uploads/images')
             run('chown web2py eden/uploads/tracks')
+
+    with cd('/tmp'): #uwsgi setup
+        run('rm uwsgi-1.0.2.1.tar.gz')
+        run('wget http://projects.unbit.it/downloads/uwsgi-1.0.2.1.tar.gz')
+        run('tar xzf uwsgi-1.0.2.1.tar.gz')
+        run('cd uwsgi-1.0.2.1 && make && cp uwsgi /usr/local/bin')
+        put('configs/run_scheduler.py','/home/web2py/')
+        put('configs/uwsgi.xml','/home/web2py/uwsgi.xml')
+        run('touch /tmp/uwsgi-prod.pid')
+        run('chown web2py: /tmp/uwsgi-prod.pid')
+        run('mkdir -p /var/log/uwsgi')
+        run('chown web2py: /var/log/uwsgi')
+        put('configs/uwsgi','/etc/init.d/uwsgi')
+        run('chmod a+x /etc/init.d/uwsgi')
+        run('update-rc.d uwsgi defaults')
+
+
