@@ -1,0 +1,12 @@
+#!/bin/sh
+mkdir /var/backups/eden
+chown postgres /var/backups/eden
+NOW=$(date +"%Y-%m-%d")
+su -c - postgres "pg_dump -c sahana > /var/backups/eden/sahana-$NOW.sql"
+su -c - postgres "pg_dump -Fc gis > /var/backups/eden/gis.dmp"
+OLD=$(date --date='7 day ago' +"%Y-%m-%d")
+rm -f /var/backups/eden/sahana-$OLD.sql
+mkdir /var/backups/eden/uploads
+tar -cf /var/backups/eden/uploads/uploadsprod-$NOW.tar -C /home/web2py/applications/eden  ./uploads
+bzip2 /var/backups/eden/uploads/uploadsprod-$NOW.tar
+rm -f /var/backups/eden/uploads/uploadsprod-$OLD.tar.bz2

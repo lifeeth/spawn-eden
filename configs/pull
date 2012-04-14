@@ -1,0 +1,13 @@
+#!/bin/sh
+/etc/init.d/uwsgi stop
+cd ~web2py/applications/eden
+sed -i 's/deployment_settings.base.migrate = False/deployment_settings.base.migrate = True/g' models/000_config.py
+git pull
+rm -rf compiled
+cd ~web2py
+sudo -H -u web2py python web2py.py -S eden -M -R applications/eden/static/scripts/tools/noop.py
+cd ~web2py/applications/eden
+sed -i 's/deployment_settings.base.migrate = True/deployment_settings.base.migrate = False/g' models/000_config.py
+cd ~web2py
+python web2py.py -S eden -R applications/eden/static/scripts/tools/compile.py
+/etc/init.d/uwsgi start
