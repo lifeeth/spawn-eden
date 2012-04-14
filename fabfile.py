@@ -147,3 +147,69 @@ def setup_eden():
 
     put('configs/stop-uwsgi','/usr/local/bin')
     run('chmod +x /usr/local/bin/stop-uwsgi')
+
+
+def configure_eden():
+
+    domain = raw_input("What domain name should we use?  ")
+    hostname = raw_input("What host name should we use?  ")
+    password = raw_input("What is the new PostgresSQL password?  ")
+    print "Now reconfiguring system to use the hostname: " + hostname
+
+    with cd('/etc'):
+        run('sed -i "s|localdomain localhost|localdomain localhost '+hostname+'|" hosts')
+        run('echo '+hostname+' >hostname')
+        run('echo '+hostname+'.'+domain+' >mailname')
+
+    with cd('/home/web2py'):
+        run('git pull')
+
+    with cd('/home/web2py/applications/eden'):
+        run('git pull')
+
+    run('/etc/init.d/postfix restart')
+
+    # Setting up Sahana
+    run('cp /home/web2py/applications/eden/deployment-templates/cron/crontab /home/web2py/applications/eden/cron')
+    run('cp /home/web2py/applications/eden/deployment-templates/models/000_config.py /home/web2py/applications/eden/models')
+    run("sed -i 's|EDITING_CONFIG_FILE = False|EDITING_CONFIG_FILE = True|' /home/web2py/applications/eden/models/000_config.py")
+    run('sed -i "s|akeytochange|+'+hostname+'.'+domain+password+'|" /home/web2py/applications/eden/models/000_config.py')
+    run('sed -i "s|127.0.0.1:8000|'+hostname+'.'+domain+'|" /home/web2py/applications/eden/models/000_config.py')
+    run("sed -i 's|base.cdn = False|base.cdn = True|' /home/web2py/applications/eden/models/000_config.py")
+
+    #Postgres
+    run('echo "CREATE USER sahana WITH PASSWORD '+password+';" > /tmp/pgpass.sql')
+    run('su -c - postgres "psql -q -d template1 -f /tmp/pgpass.sql"')
+    run('rm -f /tmp/pgpass.sql')
+    run('su -c - postgres "createdb -O sahana -E UTF8 sahana -T template0"')
+    run('su -c - postgres "createlang plpgsql -d sahana"')
+
+    #PostGIS
+    run('su -c - postgres "psql -q -d sahana -f /usr/share/postgresql/8.4/contrib/postgis-1.5/postgis.sql"')
+    run('su -c - postgres "psql -q -d sahana -f /usr/share/postgresql/8.4/contrib/postgis-1.5/spatial_ref_sys.sql"')
+    run('su -c - postgres "psql -q -d sahana -c \'grant all on geometry_columnns to sahana;\'"')
+    run('su -c - postgres "psql -q -d sahana -c \'grant all on spatial_ref_sys to sahana;\'"')
+
+    # Configure Database
+    run('sed -i \'s|deployment_settings.database.db_type = "sqlite"|deployment_settings.database.db_type = "postgres"|\' /home/web2py/applications/eden/models/000_config.py')
+    run('sed -i "s|deployment_settings.database.password = "password"|deployment_settings.database.password = '+password+'|" /home/web2py/applications/eden/models/000_config.py')
+
+    # Create the Tables & Populate with base data
+    run("sed -i 's|deployment_settings.base.prepopulate = 0|deployment_settings.base.prepopulate = 1|' /home/web2py/applications/eden/models/000_config.py")
+    run("sed -i 's|deployment_settings.base.migrate = False|deployment_settings.base.migrate = True|' /home/web2py/applications/eden/models/000_config.py")
+
+    with cd('/home/web2py'):
+        run("sudo -H -u web2py python web2py.py -S eden -M -R applications/eden/static/scripts/tools/noop.py")
+
+    #Configure for Production
+    run("sed -i 's|deployment_settings.base.prepopulate = 1|deployment_settings.base.prepopulate = 0|' /home/web2py/applications/eden/models/000_config.py")
+    run("sed -i 's|deployment_settings.base.migrate = True|deployment_settings.base.migrate = False|' /home/web2py/applications/eden/models/000_config.py")
+
+    with cd('/home/web2py'):
+        run("sudo -H -u web2py python web2py.py -S eden -R applications/eden/static/scripts/tools/compile.py")
+
+    #Schedule backups for 2:01 daily
+    run('echo "1 2   * * * * root    /usr/local/bin/backup" >> "/etc/crontab"')
+
+    print "Now rebooting..."
+    #run('reboot')
