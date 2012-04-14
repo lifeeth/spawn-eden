@@ -14,6 +14,7 @@ def setup_eden():
     run('echo "deb http://apt.balocco.name squeeze main" >> /etc/apt/sources.list')
     run('curl http://apt.balocco.name/key.asc | apt-key add -')
     run('apt-get -y update')
+    run("export DEBIAN_FRONTEND='noninteractive' && apt-get -y -q install postfix")
     package_ensure(["unzip",
                     "wget",
                     "psmisc",
@@ -21,8 +22,6 @@ def setup_eden():
                     "lrzsz",
                     "rcconf",
                     "htop",
-                    "exim4-config",
-                    "exim4-daemon-light",
                     "git-core",
                     "libgeos-c1",
                     "python2.6",
@@ -92,7 +91,8 @@ def setup_eden():
             run('chown web2py eden/uploads/tracks')
 
     with cd('/tmp'): #uwsgi setup
-        run('rm uwsgi-1.0.2.1.tar.gz')
+        with settings(warn_only=True):
+            run('rm uwsgi-1.0.2.1.tar.gz')
         run('wget http://projects.unbit.it/downloads/uwsgi-1.0.2.1.tar.gz')
         run('tar xzf uwsgi-1.0.2.1.tar.gz')
         run('cd uwsgi-1.0.2.1 && make && cp uwsgi /usr/local/bin')
