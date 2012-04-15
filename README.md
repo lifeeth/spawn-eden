@@ -4,7 +4,7 @@
 
  - We recommend a virtualenv for using these scripts.
 
- - Install the dependecies for the scripts - Fabric and Cuisine.
+ - Install the dependencies for the scripts - Fabric and Cuisine.
    
    run: `pip install -r requirements.txt`
  
