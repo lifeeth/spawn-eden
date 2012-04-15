@@ -212,5 +212,5 @@ def configure_eden():
     #Schedule backups for 2:01 daily
     run('echo "1 2   * * * * root    /usr/local/bin/backup" >> "/etc/crontab"')
 
-    run('/etc/init.d/uwsgi restart')
+    run('/etc/init.d/uwsgi start')
     print "Done."
