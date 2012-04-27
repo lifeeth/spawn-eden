@@ -41,10 +41,7 @@ def setup_eden():
                     "cherokee",
                     "libcherokee-mod-rrd",
                     "libxml2-dev",
-                    "postgresql-8.4",
-                    "python-psycopg2",
-                    "postgresql-8.4-postgis",
-                    "ptop"])
+                    "python-psycopg2"])
 
     with settings(warn_only=True):
         run('useradd -M web2py')
@@ -112,20 +109,9 @@ def setup_eden():
     put('configs/maintenance.html','/var/www/maintenance.html')
     run('/etc/init.d/cherokee restart')
 
-    put('configs/sysctl.conf','/tmp') #Postgres configs
-    run('echo /tmp/sysctl.conf >> /etc/sysctl.conf')
-    run('sysctl -w kernel.shmmax=279134208') # For 512MB RAM
-    #run('sysctl -w kernel.shmmax=552992768') # For 512MB RAM
-    run('sysctl -w kernel.shmall=2097152')
-    run("sed -i 's|#track_counts = on|track_counts = on|' /etc/postgresql/8.4/main/postgresql.conf")
-    run("sed -i 's|#autovacuum = on|autovacuum = on|' /etc/postgresql/8.4/main/postgresql.conf")
-    run("sed -i 's|shared_buffers = 28MB|shared_buffers = 160MB|' /etc/postgresql/8.4/main/postgresql.conf")
-    run("sed -i 's|#effective_cache_size = 128MB|effective_cache_size = 512MB|' /etc/postgresql/8.4/main/postgresql.conf")
-    run("sed -i 's|#work_mem = 1MB|work_mem = 4MB|' /etc/postgresql/8.4/main/postgresql.conf")
+    install_postgres() #install postgres
 
     ##Maintenance scripts
-    put('configs/backup','/usr/local/bin')
-    run('chmod +x /usr/local/bin/backup')
 
     put('configs/compile','/usr/local/bin')
     run('chmod +x /usr/local/bin/compile')
@@ -148,6 +134,31 @@ def setup_eden():
     put('configs/stop-uwsgi','/usr/local/bin')
     run('chmod +x /usr/local/bin/stop-uwsgi')
 
+def install_postgres():
+    """Install Postgres on a remote machine"""
+
+    package_ensure(["postgresql-8.4",
+                    "postgresql-8.4-postgis",
+                    "ptop"])
+
+    put('configs/sysctl.conf','/tmp') #Postgres configs
+    run('echo /tmp/sysctl.conf >> /etc/sysctl.conf')
+    run('sysctl -w kernel.shmmax=279134208') # For 512MB RAM
+    #run('sysctl -w kernel.shmmax=552992768') # For 512MB RAM
+    run('sysctl -w kernel.shmall=2097152')
+    run("sed -i 's|#track_counts = on|track_counts = on|' /etc/postgresql/8.4/main/postgresql.conf")
+    run("sed -i 's|#autovacuum = on|autovacuum = on|' /etc/postgresql/8.4/main/postgresql.conf")
+    run("sed -i 's|shared_buffers = 28MB|shared_buffers = 160MB|' /etc/postgresql/8.4/main/postgresql.conf")
+    run("sed -i 's|#effective_cache_size = 128MB|effective_cache_size = 512MB|' /etc/postgresql/8.4/main/postgresql.conf")
+    run("sed -i 's|#work_mem = 1MB|work_mem = 4MB|' /etc/postgresql/8.4/main/postgresql.conf")
+
+    ##Maintenance scripts
+    put('configs/backup','/usr/local/bin')
+    run('chmod +x /usr/local/bin/backup')
+
+def install_memcached():
+    """Installs memcached on the remote machine"""
+    package_ensure(["memcached"])
 
 def configure_eden():
 
