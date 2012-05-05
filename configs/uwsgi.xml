@@ -9,6 +9,6 @@
     <workers>4</workers>
     <pidfile>/tmp/uwsgi-prod.pid</pidfile>
     <daemonize>/var/log/uwsgi/prod.log</daemonize>
-    <socket>127.0.0.1:59025</socket>
+    <socket>/tmp/uwsgi.sock</socket>
     <master/>
 </uwsgi>
