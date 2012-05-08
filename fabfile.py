@@ -53,7 +53,8 @@ def setup_eden():
 
     with cd('/home/web2py/applications'): #Eden setup
         with settings(warn_only=True):
-            run('git clone git://github.com/flavour/eden.git')
+#            run('git clone git://github.com/flavour/eden.git')
+            run('git clone git://github.com/flavour/ifrc.git eden')
             run('chown web2py /home/web2py')
             run('mkdir -p admin/cache')
             run('chown web2py admin/cache')
