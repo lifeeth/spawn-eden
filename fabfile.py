@@ -17,7 +17,7 @@ def setup_eden():
     run("export DEBIAN_FRONTEND='noninteractive' && apt-get -y -q install postfix")
     package_ensure(["unzip",
                     "wget",
-                    "psmisc",
+   #                 "psmisc",
                     "mlocate",
                     "lrzsz",
                     "rcconf",
@@ -38,10 +38,12 @@ def setup_eden():
                     "python-xlwt",
                     "python-xlrd",
                     "build-essential",
-                    "cherokee",
-                    "libcherokee-mod-rrd",
+    #                "cherokee",
+    #                "libcherokee-mod-rrd",
                     "libxml2-dev",
                     "python-psycopg2"])
+
+    run('apt-get -y --force-yes install psmisc cherokee libcherokee-mod-rrd')
 
     with settings(warn_only=True):
         run('useradd -M web2py')
