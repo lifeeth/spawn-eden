@@ -2,6 +2,8 @@ from __future__ import with_statement
 from fabric.api import *
 from cuisine import *
 
+branch = "git://github.com/flavour/ifrc.git"
+prepopulate = "1"
 
 def init_env():
     run('apt-get -y update')
@@ -17,7 +19,7 @@ def setup_eden():
     run("export DEBIAN_FRONTEND='noninteractive' && apt-get -y -q install postfix")
     package_ensure(["unzip",
                     "wget",
-   #                 "psmisc",
+                    "psmisc",
                     "mlocate",
                     "lrzsz",
                     "rcconf",
@@ -38,12 +40,12 @@ def setup_eden():
                     "python-xlwt",
                     "python-xlrd",
                     "build-essential",
-    #                "cherokee",
-    #                "libcherokee-mod-rrd",
+                    "cherokee",
+                    "libcherokee-mod-rrd",
                     "libxml2-dev",
                     "python-psycopg2"])
 
-    run('apt-get -y --force-yes install psmisc cherokee libcherokee-mod-rrd')
+    #run('apt-get -y --force-yes install psmisc cherokee libcherokee-mod-rrd')
 
     with settings(warn_only=True):
         run('useradd -M web2py')
@@ -55,8 +57,7 @@ def setup_eden():
 
     with cd('/home/web2py/applications'): #Eden setup
         with settings(warn_only=True):
-#            run('git clone git://github.com/flavour/eden.git')
-            run('git clone git://github.com/flavour/ifrc.git eden')
+            run('git clone '+branch+' eden')
             run('chown web2py /home/web2py')
             run('mkdir -p admin/cache')
             run('chown web2py admin/cache')
@@ -210,14 +211,14 @@ def configure_eden():
     run('sed -i \'s|deployment_settings.database.password = "password"|deployment_settings.database.password = "'+password+'"|\' /home/web2py/applications/eden/models/000_config.py')
 
     # Create the Tables & Populate with base data
-    run("sed -i 's|deployment_settings.base.prepopulate = 0|deployment_settings.base.prepopulate = 1|' /home/web2py/applications/eden/models/000_config.py")
+    run("sed -i 's|deployment_settings.base.prepopulate = 0|deployment_settings.base.prepopulate = "+prepopulate+"|' /home/web2py/applications/eden/models/000_config.py")
     run("sed -i 's|deployment_settings.base.migrate = False|deployment_settings.base.migrate = True|' /home/web2py/applications/eden/models/000_config.py")
 
     with cd('/home/web2py'):
         run("sudo -H -u web2py python web2py.py -S eden -M -R applications/eden/static/scripts/tools/noop.py")
 
     #Configure for Production
-    run("sed -i 's|deployment_settings.base.prepopulate = 1|deployment_settings.base.prepopulate = 0|' /home/web2py/applications/eden/models/000_config.py")
+    run("sed -i 's|deployment_settings.base.prepopulate = "+prepopulate+"|deployment_settings.base.prepopulate = 0|' /home/web2py/applications/eden/models/000_config.py")
     run("sed -i 's|deployment_settings.base.migrate = True|deployment_settings.base.migrate = False|' /home/web2py/applications/eden/models/000_config.py")
 
     with cd('/home/web2py'):
