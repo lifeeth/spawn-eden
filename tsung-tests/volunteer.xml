@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE tsung SYSTEM "/opt/local/share/tsung/tsung-1.0.dtd">
-<tsung loglevel="notice" version="1.0">
+<tsung loglevel="debug" version="1.0">
 
   <!-- Client side setup -->
   <clients>
@@ -25,18 +25,19 @@
    </option>
   </options>
 
-  <sessions>
+
+<sessions>
 <session name='Volunteer' probability='100'  type='ts_http'>
 
 <request><http url='http://localhost:8000/ifrc/' version='1.1' method='GET'></http></request> <!-- Change the URL here -->
 <!-- Visit Registration page -->
         <request>
             <!-- Collect the formkey from the registration form (not the sign-in form!) -->
-            <dyn_variable name="_formkey" xpath="/html/body/div[3]/div[2]/div/div[2]/div/form/div/input[2]" />
+            <dyn_variable name="_formkey" xpath="/html/body/div[3]/div[2]/div/div[2]/div/form/div/input[2]/@value" />
             <http url="/ifrc/default/user/login" method="GET" version="1.1"></http>
         </request>
         <request subst="true">  <!-- Hard coded to login as test@example.com -->
-            <http url="/ifrc/default/user/login" method="POST" version="1.1" content_type='application/x-www-form-urlencoded' contents="_formname=login&amp;_formkey=%%__formkey%%&amp;email=test@example.com&amp;password=edeen&amp;_next=/ifrc/default/index&amp;_utc_offset=-330`:">
+            <http url="/ifrc/default/user/login" method="POST" version="1.1" content_type='application/x-www-form-urlencoded' contents="_formname=login&amp;_formkey=%%__formkey%%&amp;email=test@example.com&amp;password=eden&amp;_next=/ifrc/default/index&amp;_utc_offset=-330">
             </http>
         </request>
 
@@ -131,11 +132,7 @@
 <request><http url='/ifrc/static/scripts/ext/resources/images/ifrc/qtip/tip-anchor-sprite.gif' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:46 GMT' method='GET'></http></request>
 <request><http url='/ifrc/static/scripts/ext/resources/images/ifrc/qtip/tip-sprite.gif' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:46 GMT' method='GET'></http></request>
 <request><http url='/ifrc/static/img/gis/TRMM_3B42_V6_10_DAY.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
-
-<thinktime random='true' value='4'/>
 <request><http url='/ifrc/hrm/human_resource.geojson?layer=4&amp;components=None&amp;maxdepth=0&amp;references=location_id&amp;fields=name&amp;human_resource.type=2&amp;human_resource.status=1&amp;track=1&amp;bbox=123.44807617187,-11.164182481251,128.39192382813,-6.5894770570746' version='1.1' method='GET'></http></request>
-
-<thinktime random='true' value='1'/>
 <request><http url='/ifrc/static/scripts/ext/resources/images/ifrc/tree/folder.gif' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:46 GMT' method='GET'></http></request>
 <request><http url='/ifrc/static/scripts/ext/resources/images/ifrc/tree/elbow-end-plus-nl.gif' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:46 GMT' method='GET'></http></request>
 
