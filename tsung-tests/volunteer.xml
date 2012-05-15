@@ -1,0 +1,144 @@
+<?xml version="1.0"?>
+<!DOCTYPE tsung SYSTEM "/opt/local/share/tsung/tsung-1.0.dtd">
+<tsung loglevel="notice" version="1.0">
+
+  <!-- Client side setup -->
+  <clients>
+    <client host="localhost" use_controller_vm="true"/>
+  </clients>
+  
+  <!-- Server side setup -->
+<servers>
+  <server host="localhost" port="8000" type="tcp"></server>
+</servers>
+
+ <load duration="1" unit="minute">
+   <arrivalphase phase="1" duration="1" unit="minute">
+     <users maxnumber="5" arrivalrate="1" unit="second"></users>
+   </arrivalphase>
+  </load>
+
+  <options>
+   <option type="ts_http" name="user_agent">
+    <user_agent probability="80">Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.7.8) Gecko/20050513 Galeon/1.3.21</user_agent>
+    <user_agent probability="20">Mozilla/5.0 (Windows; U; Windows NT 5.2; fr-FR; rv:1.7.8) Gecko/20050511 Firefox/1.0.4</user_agent>
+   </option>
+  </options>
+
+  <sessions>
+<session name='Volunteer' probability='100'  type='ts_http'>
+
+<request><http url='http://localhost:8000/ifrc/' version='1.1' method='GET'></http></request> <!-- Change the URL here -->
+<!-- Visit Registration page -->
+        <request>
+            <!-- Collect the formkey from the registration form (not the sign-in form!) -->
+            <dyn_variable name="_formkey" xpath="/html/body/div[3]/div[2]/div/div[2]/div/form/div/input[2]" />
+            <http url="/ifrc/default/user/login" method="GET" version="1.1"></http>
+        </request>
+        <request subst="true">  <!-- Hard coded to login as test@example.com -->
+            <http url="/ifrc/default/user/login" method="POST" version="1.1" content_type='application/x-www-form-urlencoded' contents="_formname=login&amp;_formkey=%%__formkey%%&amp;email=test@example.com&amp;password=edeen&amp;_next=/ifrc/default/index&amp;_utc_offset=-330`:">
+            </http>
+        </request>
+
+<request><http url='/ifrc/static/scripts/web2py/jquery-1.7.1.min.js' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:47 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/scripts/ext/adapter/jquery/ext-jquery-adapter.js' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:45 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/scripts/ext/ext-all.js' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:45 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/scripts/ext/src/locale/ext-lang-en_GB.js' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:46 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/scripts/ext/resources/css/ext-theme.min.css' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:45 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/styles/S3/sahana.min.css' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:47 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/scripts/S3/S3.min.js' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:47 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/ifrc/graphic_staff.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/ifrc/graphic_volunteers.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/ifrc/dummy_flag.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/ifrc/graphic_members.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/ifrc/graphic_warehouse.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/ifrc/graphic_assets.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/ifrc/graphic_assessments.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/ifrc/graphic_tools.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/sahanasmall_05.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:44 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/ifrc/logo.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/ifrc/header_shadow.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/ifrc/maptip_end.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/ifrc/map_bg.jpg' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/ifrc/dashboard_shadow.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/ifrc/news_window_bg.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/ifrc/map_marker.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/ifrc/maptip_start.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/jquery.cluetip/wait.gif' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:44 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/media/closebox.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:44 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/colorbox/controls.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/colorbox/border.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/colorbox/loading_background.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/jquery-ui/ui-anim_basic_16x16.gif' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+
+<thinktime random='true' value='11'/>
+
+<request><http url='/ifrc/gis/index' version='1.1' method='GET'></http></request>
+
+<thinktime random='true' value='1'/>
+
+<request><http url='/ifrc/static/img/ifrc/map_marker_plus_left.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/scripts/S3/yepnope.1.5.4-min.js' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:47 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/scripts/gis/OpenLayers.js' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:46 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/scripts/gis/GeoExt.js' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:46 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/scripts/S3/s3.gis.min.js' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:47 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/gis/openlayers/north-mini.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/gis/openlayers/west-mini.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/gis/openlayers/east-mini.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/gis/openlayers/south-mini.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/gis/openlayers/zoom-plus-mini.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/gis/openlayers/zoom-world-mini.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/gis/openlayers/zoom-minus-mini.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/markers/gis_marker.image.marker_red.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:44 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/gis/openlayers/layer-switcher-maximize.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/gis/openlayers/layer-switcher-minimize.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/scripts/ext/resources/images/ifrc/panel/white-top-bottom.gif' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:46 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/scripts/ext/resources/images/ifrc/panel/tool-sprites.gif' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:46 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/scripts/ext/resources/images/ifrc/toolbar/bg.gif' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:46 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/scripts/ext/resources/images/ifrc/dd/drop-no.gif' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:46 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/scripts/ext/resources/images/ifrc/button/btn.gif' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:46 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/silk/wrench.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:44 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/scripts/ext/resources/images/ifrc/tree/elbow-minus-nl.gif' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:46 GMT' method='GET'></http></request>
+<request><http url='/ifrc/gis/proxy?url=http%3A//preview.grid.unep.ch%3A8080/geoserver/ows%3Fservice%3DWMS%26request%3DGetCapabilities&amp;_dc=1337081490549&amp;service=WMS&amp;request=GetCapabilities' version='1.1' method='GET'></http></request>
+<request><http url='/ifrc/static/scripts/ext/resources/images/ifrc/tree/folder-open.gif' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:46 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/scripts/ext/resources/images/ifrc/tree/leaf.gif' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:46 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/scripts/ext/resources/images/ifrc/tree/elbow-end-minus-nl.gif' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:46 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/gis/mapfish/icon_zoomfull.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/gis/mapfish/icon_zoomout.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/gis/geolocation.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/gis/mapfish/icon_zoomin.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/gis/mapfish/icon_pan.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/scripts/ext/resources/images/ifrc/grid/grid-split.gif' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:46 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/gis/mapfish/resultset_previous.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/gis/mapfish/resultset_next.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/ext/save.gif' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/gis/measuring-stick-off.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/gis/measure-area-off.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/silk/information.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:44 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/gis/streetview.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/gis/geosilk/google_earth.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/scripts/ext/resources/images/ifrc/form/trigger.gif' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:46 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/ajax-loader.gif' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/markers/gis_marker.image.Project.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:44 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/markers/gis_marker.image.Staff.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:44 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/markers/gis_marker.image.Volunteer.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:44 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/markers/gis_marker.image.Member.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:44 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/markers/gis_marker.image.Office.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:44 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/markers/gis_marker.image.Warehouse.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:44 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/markers/gis_marker.image.Geo_Earth_Quake_Epicenter.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:44 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/gis/TRMM_3B42_V6_DAILY.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/gis/GPWv3.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/scripts/ext/resources/images/ifrc/qtip/tip-anchor-sprite.gif' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:46 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/scripts/ext/resources/images/ifrc/qtip/tip-sprite.gif' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:46 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/img/gis/TRMM_3B42_V6_10_DAY.png' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:43 GMT' method='GET'></http></request>
+
+<thinktime random='true' value='4'/>
+<request><http url='/ifrc/hrm/human_resource.geojson?layer=4&amp;components=None&amp;maxdepth=0&amp;references=location_id&amp;fields=name&amp;human_resource.type=2&amp;human_resource.status=1&amp;track=1&amp;bbox=123.44807617187,-11.164182481251,128.39192382813,-6.5894770570746' version='1.1' method='GET'></http></request>
+
+<thinktime random='true' value='1'/>
+<request><http url='/ifrc/static/scripts/ext/resources/images/ifrc/tree/folder.gif' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:46 GMT' method='GET'></http></request>
+<request><http url='/ifrc/static/scripts/ext/resources/images/ifrc/tree/elbow-end-plus-nl.gif' version='1.1' if_modified_since='Tue, 15 May 2012 11:02:46 GMT' method='GET'></http></request>
+
+</session>
+  </sessions>
+</tsung>
