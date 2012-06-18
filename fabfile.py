@@ -93,10 +93,10 @@ def setup_eden():
 
     with cd('/tmp'): #uwsgi setup
         with settings(warn_only=True):
-            run('rm uwsgi-latest.tar.gz')
+            run('rm uwsgi-*.tar.gz')
         run('wget http://projects.unbit.it/downloads/uwsgi-latest.tar.gz')
         run('tar xzf uwsgi-latest.tar.gz')
-        run('cd uwsgi-latest && make && cp uwsgi /usr/local/bin')
+        run('cd uwsgi-* && make && cp uwsgi /usr/local/bin')
         put('configs/run_scheduler.py','/home/web2py/')
         put('configs/uwsgi.xml','/home/web2py/uwsgi.xml')
         run('touch /tmp/uwsgi-prod.pid')
