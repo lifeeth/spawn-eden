@@ -186,8 +186,7 @@ def configure_eden():
     run("export DEBIAN_FRONTEND='noninteractive' && dpkg-reconfigure postfix")
 
     # Setting up Sahana
-    run('cp /home/web2py/applications/eden/deployment-templates/cron/crontab /home/web2py/applications/eden/cron')
-    run('cp /home/web2py/applications/eden/deployment-templates/models/000_config.py /home/web2py/applications/eden/models')
+    run('cp /home/web2py/applications/eden/private/templates/000_config.py /home/web2py/applications/eden/models')
     run('sed -i "s|EDITING_CONFIG_FILE = False|EDITING_CONFIG_FILE = True|" /home/web2py/applications/eden/models/000_config.py')
     run('sed -i "s|akeytochange|+'+hostname+'.'+domain+password+'|" /home/web2py/applications/eden/models/000_config.py')
     run('sed -i "s|127.0.0.1:8000|'+hostname+'.'+domain+'|" /home/web2py/applications/eden/models/000_config.py')
