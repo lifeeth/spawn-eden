@@ -2,7 +2,7 @@ from __future__ import with_statement
 from fabric.api import *
 from cuisine import *
 
-branch = "git://github.com/flavour/ifrc.git"
+branch = "git://github.com/flavour/eden.git"
 prepopulate = "1"
 
 def init_env():
@@ -93,10 +93,10 @@ def setup_eden():
 
     with cd('/tmp'): #uwsgi setup
         with settings(warn_only=True):
-            run('rm uwsgi-1.0.2.1.tar.gz')
-        run('wget http://projects.unbit.it/downloads/uwsgi-1.0.2.1.tar.gz')
-        run('tar xzf uwsgi-1.0.2.1.tar.gz')
-        run('cd uwsgi-1.0.2.1 && make && cp uwsgi /usr/local/bin')
+            run('rm uwsgi-latest.tar.gz')
+        run('wget http://projects.unbit.it/downloads/uwsgi-latest.tar.gz')
+        run('tar xzf uwsgi-latest.tar.gz')
+        run('cd uwsgi-latest && make && cp uwsgi /usr/local/bin')
         put('configs/run_scheduler.py','/home/web2py/')
         put('configs/uwsgi.xml','/home/web2py/uwsgi.xml')
         run('touch /tmp/uwsgi-prod.pid')
