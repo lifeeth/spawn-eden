@@ -3,7 +3,7 @@ from fabric.api import *
 from cuisine import *
 
 branch = "git://github.com/flavour/eden.git"
-prepopulate = "1"
+template = "default"
 
 def init_env():
     run('apt-get -y update')
@@ -188,9 +188,10 @@ def configure_eden():
     # Setting up Sahana
     run('cp /home/web2py/applications/eden/private/templates/000_config.py /home/web2py/applications/eden/models')
     run('sed -i "s|EDITING_CONFIG_FILE = False|EDITING_CONFIG_FILE = True|" /home/web2py/applications/eden/models/000_config.py')
-    run('sed -i "s|akeytochange|+'+hostname+'.'+domain+password+'|" /home/web2py/applications/eden/models/000_config.py')
+    run('sed -i "s|#settings.base.public_url|settings.base.public_url|" /home/web2py/applications/eden/models/000_config.py')
     run('sed -i "s|127.0.0.1:8000|'+hostname+'.'+domain+'|" /home/web2py/applications/eden/models/000_config.py')
-    run('sed -i "s|base.cdn = False|base.cdn = True|" /home/web2py/applications/eden/models/000_config.py')
+    run('sed -i "s|#settings.base.cdn|settings.base.cdn|" /home/web2py/applications/eden/models/000_config.py')
+    run('sed -i "s|settings.base.template = \"default\"|settings.base.template = "'+template+'"|" /home/web2py/applications/eden/models/000_config.py')
 
     #Postgres
     run('echo "CREATE USER sahana WITH PASSWORD \''+password+'\';" > /tmp/pgpass.sql')
@@ -210,14 +211,12 @@ def configure_eden():
     run('sed -i \'s|deployment_settings.database.password = "password"|deployment_settings.database.password = "'+password+'"|\' /home/web2py/applications/eden/models/000_config.py')
 
     # Create the Tables & Populate with base data
-    run("sed -i 's|deployment_settings.base.prepopulate = 0|deployment_settings.base.prepopulate = "+prepopulate+"|' /home/web2py/applications/eden/models/000_config.py")
     run("sed -i 's|deployment_settings.base.migrate = False|deployment_settings.base.migrate = True|' /home/web2py/applications/eden/models/000_config.py")
 
     with cd('/home/web2py'):
         run("sudo -H -u web2py python web2py.py -S eden -M -R applications/eden/static/scripts/tools/noop.py")
 
     #Configure for Production
-    run("sed -i 's|deployment_settings.base.prepopulate = "+prepopulate+"|deployment_settings.base.prepopulate = 0|' /home/web2py/applications/eden/models/000_config.py")
     run("sed -i 's|deployment_settings.base.migrate = True|deployment_settings.base.migrate = False|' /home/web2py/applications/eden/models/000_config.py")
 
     with cd('/home/web2py'):
