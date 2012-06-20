@@ -2,9 +2,7 @@
     <uid>web2py</uid>
     <gid>web2py</gid>
     <pythonpath>/home/web2py/</pythonpath>
-    <app mountpoint="/">
-        <script>wsgihandler</script>
-    </app>
+    <module>wsgihandler</module>
     <mule>run_scheduler.py</mule>
     <workers>4</workers>
     <pidfile>/tmp/uwsgi-prod.pid</pidfile>
