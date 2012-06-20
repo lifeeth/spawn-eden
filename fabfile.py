@@ -222,7 +222,7 @@ def configure_eden():
     run("sed -i 's|settings.base.migrate = True|settings.base.migrate = False|' /home/web2py/applications/eden/models/000_config.py")
 
     with cd('/home/web2py'):
-        run("sudo -H -u web2py python web2py.py -S eden -R applications/eden/static/scripts/tools/compile.py")
+        run("sudo -H -u web2py python web2py.py -S eden -R applications/eden/static/scripts/tools/compile.py -M")
 
     #Schedule backups for 2:01 daily
     run('echo "1 2   * * * * root    /usr/local/bin/backup" >> "/etc/crontab"')
