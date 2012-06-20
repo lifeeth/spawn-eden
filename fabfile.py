@@ -207,17 +207,19 @@ def configure_eden():
     sudo('psql -q -d sahana -c \'grant all on spatial_ref_sys to sahana;\'', user='postgres')
 
     # Configure Database
-    run('sed -i \'s|deployment_settings.database.db_type = "sqlite"|deployment_settings.database.db_type = "postgres"|\' /home/web2py/applications/eden/models/000_config.py')
-    run('sed -i \'s|deployment_settings.database.password = "password"|deployment_settings.database.password = "'+password+'"|\' /home/web2py/applications/eden/models/000_config.py')
+    run('sed -i \'s|#settings.database.db_type = "postgres"|settings.database.db_type = "postgres"|\' /home/web2py/applications/eden/models/000_config.py')
+    run('sed -i \'s|#settings.database.port = 5432|settings.database.port = 5432|\' /home/web2py/applications/eden/models/000_config.py')
+    run('sed -i \'s|#settings.database.password = "password"|settings.database.password = "'+password+'"|\' /home/web2py/applications/eden/models/000_config.py')
+    run('sed -i \'s|#settings.gis.spatialdb = True|settings.gis.spatialdb = True|\' /home/web2py/applications/eden/models/000_config.py')
 
     # Create the Tables & Populate with base data
-    run("sed -i 's|deployment_settings.base.migrate = False|deployment_settings.base.migrate = True|' /home/web2py/applications/eden/models/000_config.py")
+    run("sed -i 's|settings.base.migrate = False|settings.base.migrate = True|' /home/web2py/applications/eden/models/000_config.py")
 
     with cd('/home/web2py'):
         run("sudo -H -u web2py python web2py.py -S eden -M -R applications/eden/static/scripts/tools/noop.py")
 
     #Configure for Production
-    run("sed -i 's|deployment_settings.base.migrate = True|deployment_settings.base.migrate = False|' /home/web2py/applications/eden/models/000_config.py")
+    run("sed -i 's|settings.base.migrate = True|settings.base.migrate = False|' /home/web2py/applications/eden/models/000_config.py")
 
     with cd('/home/web2py'):
         run("sudo -H -u web2py python web2py.py -S eden -R applications/eden/static/scripts/tools/compile.py")
