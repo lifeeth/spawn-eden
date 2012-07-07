@@ -1,6 +1,12 @@
 from __future__ import with_statement
 from fabric.api import *
 from cuisine import *
+import time
+
+try:
+        import boto.ec2
+except Exception as e:
+        print "Install boto for EC2 support"
 
 branch = "git://github.com/flavour/eden.git"
 template = "default"
@@ -229,3 +235,42 @@ def configure_eden():
 
     run('/etc/init.d/uwsgi start')
     print "Done."
+
+
+def init_aws():
+    env.key_filename = "awskey.pem"
+    regions = boto.ec2.regions()
+
+    singapore = regions[6] # This needed not be singapore - check
+
+    ec2_conn = singapore.connect() #lets connect up ec2
+
+
+    ##########################################################
+    ###########CHANGE THE FOLLOWING IF NEEDED#################
+    IMAGE = 'ami-6a7a0338' # Debian Squeeze 32 bit base image.
+    INSTANCE_TYPE = 't1.micro'
+    ZONE = 'ap-southeast-1a'
+    SECURITY_GROUPS = ['default'] # Allow all ports
+    KEY_NAME = 'awskey' # YOUR SSH KEY
+    TERMINATION_BEHAVIOR = None
+
+    ###########################################################
+    reservations = ec2_conn.get_all_instances()
+    print "You have the following instances"
+    for reservation in reservations:
+        for instance in reservation.instances:
+            print str(instance)+" state: "+str(instance.state)
+
+    print 'Starting an EC2 instance of type {0} with image {1}'.format(INSTANCE_TYPE, IMAGE)
+    reservation = ec2_conn.run_instances(IMAGE,instance_type=INSTANCE_TYPE,key_name=KEY_NAME,placement=ZONE,security_groups=SECURITY_GROUPS,instance_initiated_shutdown_behavior=TERMINATION_BEHAVIOR)
+    instance = reservation.instances[0]
+    ec2_conn.create_tags([instance.id], {"name": "changeme"})
+    print 'Checking if instance: {0} is running'.format(instance.dns_name)
+
+    while not instance.update() == 'running':
+        print "."
+        time.sleep(1) # Let the instance start up
+
+    print 'Started the instance: {0}'.format(instance.dns_name)
+
