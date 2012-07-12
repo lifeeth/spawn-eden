@@ -276,15 +276,16 @@ def aws_instance_list(ZONE = 'us-east-1b'):
 
     regions = boto.ec2.regions()
     for region in regions:
-        if region.name in ZONE:
-            ec2_conn = region.connect()
+        ec2_conn = region.connect()
 
-    reservations = ec2_conn.get_all_instances()
-    print "You have the following instances:\n"
-    for reservation in reservations:
-        for instance in reservation.instances:
-            print str(instance)+" state: "+str(instance.state)
-    print "\n"
+        reservations = ec2_conn.get_all_instances()
+        print "---------------------------------"
+        print region
+        print "You have the following instances:\n"
+        for reservation in reservations:
+            for instance in reservation.instances:
+                print str(instance)+" state: "+str(instance.state)
+        print "\n"
 
 def aws_instance_clean(ZONE = 'us-east-1b'):
 
