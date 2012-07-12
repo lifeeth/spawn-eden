@@ -237,30 +237,26 @@ def configure_eden():
     print "Done."
 
 
-def init_aws():
-    env.key_filename = "awskey.pem"
+def aws_instance_spawn(IMAGE='ami-6a7a0338',
+            INSTANCE_TYPE = 't1.micro', # Debian Squeeze 32 bit base image.
+            ZONE = 'ap-southeast-1a',
+            SECURITY_GROUPS = ['default'], # Allow all ports
+            KEY_NAME = 'awskey', # YOUR SSH KEY
+            TERMINATION_BEHAVIOR = None,
+            ):
+
+    env.key_filename = KEY_NAME+".pem"
     regions = boto.ec2.regions()
+    for region in regions:
+        if region.name in ZONE:
+            ec2_conn = region.connect()
 
-    singapore = regions[6] # This needed not be singapore - check
-
-    ec2_conn = singapore.connect() #lets connect up ec2
-
-
-    ##########################################################
-    ###########CHANGE THE FOLLOWING IF NEEDED#################
-    IMAGE = 'ami-6a7a0338' # Debian Squeeze 32 bit base image.
-    INSTANCE_TYPE = 't1.micro'
-    ZONE = 'ap-southeast-1a'
-    SECURITY_GROUPS = ['default'] # Allow all ports
-    KEY_NAME = 'awskey' # YOUR SSH KEY
-    TERMINATION_BEHAVIOR = None
-
-    ###########################################################
     reservations = ec2_conn.get_all_instances()
-    print "You have the following instances"
+    print "You have the following instances:\n"
     for reservation in reservations:
         for instance in reservation.instances:
             print str(instance)+" state: "+str(instance.state)
+    print "\n"
 
     print 'Starting an EC2 instance of type {0} with image {1}'.format(INSTANCE_TYPE, IMAGE)
     reservation = ec2_conn.run_instances(IMAGE,instance_type=INSTANCE_TYPE,key_name=KEY_NAME,placement=ZONE,security_groups=SECURITY_GROUPS,instance_initiated_shutdown_behavior=TERMINATION_BEHAVIOR)
@@ -274,3 +270,33 @@ def init_aws():
 
     print 'Started the instance: {0}'.format(instance.dns_name)
 
+def aws_instance_list(ZONE = 'ap-southeast-1a'):
+
+    regions = boto.ec2.regions()
+    for region in regions:
+        if region.name in ZONE:
+            ec2_conn = region.connect()
+
+    reservations = ec2_conn.get_all_instances()
+    print "You have the following instances:\n"
+    for reservation in reservations:
+        for instance in reservation.instances:
+            print str(instance)+" state: "+str(instance.state)
+    print "\n"
+
+def aws_instance_clean(ZONE = 'ap-southeast-1a'):
+
+    regions = boto.ec2.regions()
+    for region in regions:
+        if region.name in ZONE:
+            ec2_conn = region.connect()
+
+    reservations = ec2_conn.get_all_instances()
+    print "You have the following instances:\n"
+    for reservation in reservations:
+        for instance in reservation.instances:
+            if instance.state != 'terminated':
+                print str(instance)+" state: "+str(instance.state)
+                if raw_input("TERMINATE INSTANCE " + str(instance) +" Y/N : ") == "Y":
+                    instance.terminate()
+    print "\n"
