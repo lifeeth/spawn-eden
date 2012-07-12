@@ -234,15 +234,17 @@ def configure_eden():
     run('echo "1 2   * * * * root    /usr/local/bin/backup" >> "/etc/crontab"')
 
     run('/etc/init.d/uwsgi start')
+    run('/etc/init.d/cherokee restart')
     print "Done."
 
 
-def aws_instance_spawn(IMAGE='ami-6a7a0338',
+def aws_instance_spawn(IMAGE='ami-cb66b2a2',
             INSTANCE_TYPE = 't1.micro', # Debian Squeeze 32 bit base image.
-            ZONE = 'ap-southeast-1a',
+            ZONE = 'us-east-1b',
             SECURITY_GROUPS = ['default'], # Allow all ports
             KEY_NAME = 'awskey', # YOUR SSH KEY
             TERMINATION_BEHAVIOR = None,
+            NAME ='changeme',
             ):
 
     env.key_filename = KEY_NAME+".pem"
@@ -261,7 +263,7 @@ def aws_instance_spawn(IMAGE='ami-6a7a0338',
     print 'Starting an EC2 instance of type {0} with image {1}'.format(INSTANCE_TYPE, IMAGE)
     reservation = ec2_conn.run_instances(IMAGE,instance_type=INSTANCE_TYPE,key_name=KEY_NAME,placement=ZONE,security_groups=SECURITY_GROUPS,instance_initiated_shutdown_behavior=TERMINATION_BEHAVIOR)
     instance = reservation.instances[0]
-    ec2_conn.create_tags([instance.id], {"name": "changeme"})
+    ec2_conn.create_tags([instance.id], {"name": NAME})
     print 'Checking if instance: {0} is running'.format(instance.dns_name)
 
     while not instance.update() == 'running':
@@ -270,7 +272,7 @@ def aws_instance_spawn(IMAGE='ami-6a7a0338',
 
     print 'Started the instance: {0}'.format(instance.dns_name)
 
-def aws_instance_list(ZONE = 'ap-southeast-1a'):
+def aws_instance_list(ZONE = 'us-east-1b'):
 
     regions = boto.ec2.regions()
     for region in regions:
@@ -284,7 +286,7 @@ def aws_instance_list(ZONE = 'ap-southeast-1a'):
             print str(instance)+" state: "+str(instance.state)
     print "\n"
 
-def aws_instance_clean(ZONE = 'ap-southeast-1a'):
+def aws_instance_clean(ZONE = 'us-east-1b'):
 
     regions = boto.ec2.regions()
     for region in regions:
