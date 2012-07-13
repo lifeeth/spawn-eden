@@ -4,9 +4,9 @@ from cuisine import *
 import time
 
 try:
-        import boto.ec2
+    import boto.ec2
 except Exception as e:
-        print "Install boto for EC2 support"
+    print "Install boto for EC2 support"
 
 branch = "git://github.com/flavour/eden.git"
 template = "default"
@@ -16,6 +16,10 @@ def init_env():
     run('apt-get -y upgrade')
     run('apt-get -y install aptitude sudo curl') # So that Cuisine plays nice
     package_update()
+
+def setup_eden_standalone():
+    setup_eden()
+    install_postgres() # Install Postgres
 
 def setup_eden():
     init_env()
@@ -119,8 +123,6 @@ def setup_eden():
     put('configs/maintenance.html','/var/www/maintenance.html')
     run('/etc/init.d/cherokee restart')
 
-    install_postgres() #install postgres
-
     ##Maintenance scripts
 
     put('configs/compile','/usr/local/bin')
@@ -143,6 +145,7 @@ def setup_eden():
 
     put('configs/stop-uwsgi','/usr/local/bin')
     run('chmod +x /usr/local/bin/stop-uwsgi')
+    run('/etc/init.d/cherokee stop')
 
 def install_postgres():
     """Install Postgres on a remote machine"""
@@ -170,7 +173,7 @@ def install_memcached():
     """Installs memcached on the remote machine"""
     package_ensure(["memcached"])
 
-def configure_eden():
+def configure_eden_standalone(start_eden = True):
 
     domain = raw_input("What domain name should we use?  ")
     hostname = raw_input("What host name should we use?  ")
@@ -233,13 +236,18 @@ def configure_eden():
     #Schedule backups for 2:01 daily
     run('echo "1 2   * * * * root    /usr/local/bin/backup" >> "/etc/crontab"')
 
-    run('/etc/init.d/uwsgi start')
-    run('/etc/init.d/cherokee restart')
+    if start_eden:
+        run('/etc/init.d/uwsgi start')
+        run('/etc/init.d/cherokee start')
+    else:
+        run('/etc/init.d/uwsgi stop')
+        run('/etc/init.d/cherokee stop')
+        
     print "Done."
 
 
-def aws_instance_spawn(IMAGE='ami-cb66b2a2',
-            INSTANCE_TYPE = 't1.micro', # Debian Squeeze 32 bit base image.
+def aws_spawn(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
+            INSTANCE_TYPE = 't1.micro', 
             ZONE = 'us-east-1b',
             SECURITY_GROUPS = ['default'], # Allow all ports
             KEY_NAME = 'awskey', # YOUR SSH KEY
@@ -253,15 +261,8 @@ def aws_instance_spawn(IMAGE='ami-cb66b2a2',
         if region.name in ZONE:
             ec2_conn = region.connect()
 
-    reservations = ec2_conn.get_all_instances()
-    print "You have the following instances:\n"
-    for reservation in reservations:
-        for instance in reservation.instances:
-            print str(instance)+" state: "+str(instance.state)
-    print "\n"
-
     print 'Starting an EC2 instance of type {0} with image {1}'.format(INSTANCE_TYPE, IMAGE)
-    reservation = ec2_conn.run_instances(IMAGE,instance_type=INSTANCE_TYPE,key_name=KEY_NAME,placement=ZONE,security_groups=SECURITY_GROUPS,instance_initiated_shutdown_behavior=TERMINATION_BEHAVIOR)
+    reservation = ec2_conn.run_instances(IMAGE, instance_type=INSTANCE_TYPE, key_name=KEY_NAME, placement=ZONE, security_groups=SECURITY_GROUPS, instance_initiated_shutdown_behavior=TERMINATION_BEHAVIOR)
     instance = reservation.instances[0]
     ec2_conn.create_tags([instance.id], {"name": NAME})
     print 'Checking if instance: {0} is running'.format(instance.dns_name)
@@ -271,8 +272,9 @@ def aws_instance_spawn(IMAGE='ami-cb66b2a2',
         time.sleep(1) # Let the instance start up
 
     print 'Started the instance: {0}'.format(instance.dns_name)
+    return instance.dns_name
 
-def aws_instance_list(ZONE = 'us-east-1b'):
+def aws_list(ZONE = 'us-east-1b'):
 
     regions = boto.ec2.regions()
     for region in regions:
@@ -287,7 +289,7 @@ def aws_instance_list(ZONE = 'us-east-1b'):
                 print str(instance)+" state: "+str(instance.state)
         print "\n"
 
-def aws_instance_clean(ZONE = 'us-east-1b'):
+def aws_clean(ZONE = 'us-east-1b'):
 
     regions = boto.ec2.regions()
     for region in regions:
@@ -303,3 +305,45 @@ def aws_instance_clean(ZONE = 'us-east-1b'):
                 if raw_input("TERMINATE INSTANCE " + str(instance) +" Y/N : ") == "Y":
                     instance.terminate()
     print "\n"
+
+def aws_postgres(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
+            INSTANCE_TYPE = 't1.micro', 
+            ZONE = 'us-east-1b',
+            SECURITY_GROUPS = ['default'], # Allow all ports
+            KEY_NAME = 'awskey', # YOUR SSH KEY
+            TERMINATION_BEHAVIOR = None,
+            NAME ='changeme'
+    ):
+    
+    machine = aws_spawn(IMAGE,INSTANCE_TYPE,ZONE,SECURITY_GROUPS,KEY_NAME,TERMINATION_BEHAVIOR,NAME)
+    env.host_string = machine
+    env.user = 'root' # For AWS
+    env.key_filename = KEY_NAME+".pem"
+    print 'Sleeping for 60 seconds to let the machine spawn.'
+    time.sleep(60)
+    setup_eden_standalone()
+    configure_eden_standalone(start_eden=False)
+    print 'Eden Postgres now installed and running at {0}'.format(machine)
+    return machine
+
+    
+def aws_eden_standalone(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
+            INSTANCE_TYPE = 't1.micro', 
+            ZONE = 'us-east-1b',
+            SECURITY_GROUPS = ['default'], # Allow all ports
+            KEY_NAME = 'awskey', # YOUR SSH KEY
+            TERMINATION_BEHAVIOR = None,
+            NAME ='changeme'
+    ):
+    
+    machine = aws_spawn(IMAGE,INSTANCE_TYPE,ZONE,SECURITY_GROUPS,KEY_NAME,TERMINATION_BEHAVIOR,NAME)
+    env.host_string = machine
+    env.user = 'root' # For AWS
+    env.key_filename = KEY_NAME+".pem"
+    print 'Sleeping for 60 seconds to let the machine spawn.'
+    time.sleep(60)
+    setup_eden_standalone()
+    configure_eden_standalone()
+    print 'Eden standalone now installed and running at {0}'.format(machine)
+    return machine
+    

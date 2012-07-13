@@ -10,6 +10,6 @@
  
  - Use the following commands to install and configure an Eden instance.
    
-   Install: `fab -H targetmachine setup_eden`
+   Install: `fab -H targetmachine setup_eden_standalone`
    
-   Configure: `fab -H targetmachine configure_eden`
+   Configure: `fab -H targetmachine configure_eden_standalone`
