@@ -16,26 +16,22 @@ def init_env():
     run('apt-get -y update')
     run('apt-get -y upgrade')
     run('apt-get -y install aptitude sudo curl') # So that Cuisine plays nice
-    package_update()
-
-def setup_eden_standalone():
-    setup_eden()
-    install_postgres() # Install Postgres
-
-def setup_eden():
-    init_env()
-    run('echo "deb http://apt.balocco.name squeeze main" >> /etc/apt/sources.list')
-    run('curl http://apt.balocco.name/key.asc | apt-key add -')
-    run('apt-get -y update')
     run("export DEBIAN_FRONTEND='noninteractive' && apt-get -y -q install postfix")
+    package_update()
     package_ensure(["unzip",
                     "wget",
                     "psmisc",
                     "mlocate",
                     "lrzsz",
                     "rcconf",
-                    "htop",
-                    "python2.6",
+                    "htop"])
+
+def setup_eden(): # By default setups postgres,uwsgi and cherokee
+    init_env()
+    run('echo "deb http://apt.balocco.name squeeze main" >> /etc/apt/sources.list')
+    run('curl http://apt.balocco.name/key.asc | apt-key add -')
+    run('apt-get -y update')
+    package_ensure(["python2.6",
                     "python-dev",
                     "ipython",
                     "build-essential",
@@ -46,7 +42,7 @@ def setup_eden():
     #run('apt-get -y --force-yes install psmisc cherokee libcherokee-mod-rrd')
     
     drop_eden() # Put Eden files in the proper directories.
-
+    install_postgres() # Install Postgres
     with cd('/tmp'): #uwsgi setup
         with settings(warn_only=True):
             run('rm uwsgi-*.tar.gz')
@@ -248,12 +244,9 @@ def configure_eden_standalone(start_eden = True):
     if start_eden:
         run('/etc/init.d/uwsgi start')
         run('/etc/init.d/cherokee start')
-    else:
-        run('/etc/init.d/uwsgi stop')
-        run('/etc/init.d/cherokee stop')
     
     time.sleep(3)
-    
+
     print "Done."
 
 
@@ -332,7 +325,9 @@ def aws_postgres(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
     env.key_filename = KEY_NAME+".pem"
     print 'Sleeping for 60 seconds to let the machine spawn.'
     time.sleep(60)
-    setup_eden_standalone()
+    init_env()
+    drop_eden()
+    install_postgres() # Install Postgres
     configure_eden_standalone(start_eden=False)
     print 'Eden Postgres now installed and running at {0}'.format(machine)
     return machine
@@ -353,7 +348,7 @@ def aws_eden_standalone(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image
     env.key_filename = KEY_NAME+".pem"
     print 'Sleeping for 60 seconds to let the machine spawn.'
     time.sleep(60)
-    setup_eden_standalone()
+    setup_eden()
     configure_eden_standalone()
     print 'Eden standalone now installed and running at {0}'.format(machine)
     return machine
