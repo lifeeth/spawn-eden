@@ -2,6 +2,7 @@ from __future__ import with_statement
 from fabric.api import *
 from cuisine import *
 import time
+import os
 
 try:
     import boto.ec2
@@ -34,72 +35,17 @@ def setup_eden():
                     "lrzsz",
                     "rcconf",
                     "htop",
-                    "git-core",
-                    "libgeos-c1",
                     "python2.6",
                     "python-dev",
                     "ipython",
-                    "python-lxml",
-                    "python-setuptools",
-                    "python-shapely",
-                    "python-dateutil",
-                    "python-serial",
-                    "python-imaging",
-                    "python-reportlab",
-                    "python-matplotlib",
-                    "python-xlwt",
-                    "python-xlrd",
                     "build-essential",
                     "cherokee",
                     "libcherokee-mod-rrd",
-                    "libxml2-dev",
-                    "python-psycopg2"])
+                    "libxml2-dev"])
 
     #run('apt-get -y --force-yes install psmisc cherokee libcherokee-mod-rrd')
-
-    with settings(warn_only=True):
-        run('useradd -M web2py')
-
-    with cd('/home'): # Pull Web2py
-        with settings(warn_only=True):
-            run('git clone git://github.com/mdipierro/web2py.git')
-        put('configs/routes.py','/home/web2py/')
-
-    with cd('/home/web2py/applications'): #Eden setup
-        with settings(warn_only=True):
-            run('git clone '+branch+' eden')
-            run('chown web2py /home/web2py')
-            run('mkdir -p admin/cache')
-            run('chown web2py admin/cache')
-            run('chown web2py admin/cron')
-            run('mkdir -p admin/databases')
-            run('chown web2py admin/databases')
-            run('mkdir -p admin/errors')
-            run('chown web2py admin/errors')
-            run('mkdir -p admin/sessions')
-            run('chown web2py admin/sessions')
-            run('chown web2py eden')
-            run('mkdir -p eden/cache')
-            run('chown web2py eden/cache')
-            run('chown web2py eden/cron')
-            run('mkdir -p eden/databases')
-            run('chown web2py eden/databases')
-            run('mkdir -p eden/errors')
-            run('chown web2py eden/errors')
-            run('chown web2py eden/models')
-            run('mkdir -p eden/sessions')
-            run('chown web2py eden/sessions')
-            run('chown web2py eden/static/img/markers')
-            run('mkdir -p eden/static/cache/chart')
-            run('chown web2py -R eden/static/cache')
-            run('mkdir -p eden/uploads')
-            run('chown web2py eden/uploads')
-            run('mkdir -p eden/uploads/gis_cache')
-            run('mkdir -p eden/uploads/images')
-            run('mkdir -p eden/uploads/tracks')
-            run('chown web2py eden/uploads/gis_cache')
-            run('chown web2py eden/uploads/images')
-            run('chown web2py eden/uploads/tracks')
+    
+    drop_eden() # Put Eden files in the proper directories.
 
     with cd('/tmp'): #uwsgi setup
         with settings(warn_only=True):
@@ -146,6 +92,69 @@ def setup_eden():
     put('configs/stop-uwsgi','/usr/local/bin')
     run('chmod +x /usr/local/bin/stop-uwsgi')
     run('/etc/init.d/cherokee stop')
+
+def drop_eden(path='/home'): # Web2py directory will be created within this directory.
+    
+    package_ensure(["git-core",
+                    "libgeos-c1",
+                    "python2.6",
+                    "python-dev",
+                    "ipython",
+                    "python-lxml",
+                    "python-setuptools",
+                    "python-shapely",
+                    "python-dateutil",
+                    "python-serial",
+                    "python-imaging",
+                    "python-reportlab",
+                    "python-matplotlib",
+                    "python-xlwt",
+                    "python-xlrd",
+                    "python-psycopg2"])
+
+    with settings(warn_only=True):
+        run('useradd -M web2py')
+
+    with cd(path): # Pull Web2py
+        with settings(warn_only=True):
+            run('git clone git://github.com/mdipierro/web2py.git')
+        put('configs/routes.py',os.path.join(path,'web2py'))
+
+    with cd(os.path.join(path,'web2py/applications')): #Eden setup
+        with settings(warn_only=True):
+            run('git clone '+branch+' eden')
+            run('chown web2py '+str(os.path.join(path,'web2py')))
+            run('mkdir -p admin/cache')
+            run('chown web2py admin/cache')
+            run('chown web2py admin/cron')
+            run('mkdir -p admin/databases')
+            run('chown web2py admin/databases')
+            run('mkdir -p admin/errors')
+            run('chown web2py admin/errors')
+            run('mkdir -p admin/sessions')
+            run('chown web2py admin/sessions')
+            run('chown web2py eden')
+            run('mkdir -p eden/cache')
+            run('chown web2py eden/cache')
+            run('chown web2py eden/cron')
+            run('mkdir -p eden/databases')
+            run('chown web2py eden/databases')
+            run('mkdir -p eden/errors')
+            run('chown web2py eden/errors')
+            run('chown web2py eden/models')
+            run('mkdir -p eden/sessions')
+            run('chown web2py eden/sessions')
+            run('chown web2py eden/static/img/markers')
+            run('mkdir -p eden/static/cache/chart')
+            run('chown web2py -R eden/static/cache')
+            run('mkdir -p eden/uploads')
+            run('chown web2py eden/uploads')
+            run('mkdir -p eden/uploads/gis_cache')
+            run('mkdir -p eden/uploads/images')
+            run('mkdir -p eden/uploads/tracks')
+            run('chown web2py eden/uploads/gis_cache')
+            run('chown web2py eden/uploads/images')
+            run('chown web2py eden/uploads/tracks')
 
 def install_postgres():
     """Install Postgres on a remote machine"""
@@ -242,7 +251,9 @@ def configure_eden_standalone(start_eden = True):
     else:
         run('/etc/init.d/uwsgi stop')
         run('/etc/init.d/cherokee stop')
-        
+    
+    time.sleep(3)
+    
     print "Done."
 
 
