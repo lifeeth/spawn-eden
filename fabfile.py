@@ -256,7 +256,7 @@ def configure_eden_standalone(start_eden = True):
 def aws_spawn(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
             INSTANCE_TYPE = 't1.micro', 
             ZONE = 'us-east-1b',
-            SECURITY_GROUPS = ['default'], # Allow all ports
+            SECURITY_GROUP = 'default', # Allow all ports
             KEY_NAME = 'awskey', # YOUR SSH KEY
             TERMINATION_BEHAVIOR = None,
             NAME ='changeme',
@@ -269,7 +269,7 @@ def aws_spawn(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
             ec2_conn = region.connect()
 
     print 'Starting an EC2 instance of type {0} with image {1}'.format(INSTANCE_TYPE, IMAGE)
-    reservation = ec2_conn.run_instances(IMAGE, instance_type=INSTANCE_TYPE, key_name=KEY_NAME, placement=ZONE, security_groups=SECURITY_GROUPS, instance_initiated_shutdown_behavior=TERMINATION_BEHAVIOR)
+    reservation = ec2_conn.run_instances(IMAGE, instance_type=INSTANCE_TYPE, key_name=KEY_NAME, placement=ZONE, security_groups=[SECURITY_GROUP], instance_initiated_shutdown_behavior=TERMINATION_BEHAVIOR)
     instance = reservation.instances[0]
     ec2_conn.create_tags([instance.id], {"Name": NAME})
     print 'Checking if instance: {0} is running'.format(instance.dns_name)
@@ -319,13 +319,13 @@ def aws_clean(ZONE = 'us-east-1b'):
 def aws_postgres(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
             INSTANCE_TYPE = 't1.micro', 
             ZONE = 'us-east-1b',
-            SECURITY_GROUPS = ['default'], # Allow all ports
+            SECURITY_GROUP = 'default', # Allow all ports
             KEY_NAME = 'awskey', # YOUR SSH KEY
             TERMINATION_BEHAVIOR = None,
             NAME ='changeme'
     ):
     
-    machine = aws_spawn(IMAGE,INSTANCE_TYPE,ZONE,SECURITY_GROUPS,KEY_NAME,TERMINATION_BEHAVIOR,NAME)
+    machine = aws_spawn(IMAGE,INSTANCE_TYPE,ZONE,SECURITY_GROUP,KEY_NAME,TERMINATION_BEHAVIOR,NAME)
     env.host_string = machine
     env.user = 'root' # For AWS
     env.key_filename = KEY_NAME+".pem"
@@ -342,13 +342,13 @@ def aws_postgres(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
 def aws_eden_standalone(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
             INSTANCE_TYPE = 't1.micro', 
             ZONE = 'us-east-1b',
-            SECURITY_GROUPS = ['default'], # Allow all ports
+            SECURITY_GROUP = 'default', # Allow all ports
             KEY_NAME = 'awskey', # YOUR SSH KEY
             TERMINATION_BEHAVIOR = None,
             NAME ='changeme'
     ):
     
-    machine = aws_spawn(IMAGE,INSTANCE_TYPE,ZONE,SECURITY_GROUPS,KEY_NAME,TERMINATION_BEHAVIOR,NAME)
+    machine = aws_spawn(IMAGE,INSTANCE_TYPE,ZONE,SECURITY_GROUP,KEY_NAME,TERMINATION_BEHAVIOR,NAME)
     env.host_string = machine
     env.user = 'root' # For AWS
     env.key_filename = KEY_NAME+".pem"
@@ -371,5 +371,15 @@ def aws_import_key(key_name, public_key, ZONE='us-east-1b'):
     public_key_material = open(public_key,'r').read()
     ec2_conn.import_key_pair(key_name, public_key_material)
 
+def aws_create_security_group(name, description='None', ports=[80,22,443],  ZONE='us-east-1b'):
+    # This function creates security groups with access to the ports from *ALL* ips.
 
+    regions = boto.ec2.regions()
+    for region in regions:
+        if region.name in ZONE:
+            ec2_conn = region.connect()
 
+    security_group = ec2_conn.create_security_group(name,description)
+
+    for port in ports:
+        security_group.authorize('tcp',port,port,'0.0.0.0/0')
