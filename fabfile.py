@@ -174,9 +174,11 @@ def install_postgres():
     put('configs/backup','/usr/local/bin')
     run('chmod +x /usr/local/bin/backup')
 
+
 def install_memcached():
     """Installs memcached on the remote machine"""
     package_ensure(["memcached"])
+
 
 def configure_eden_standalone(start_eden = True):
 
@@ -199,13 +201,6 @@ def configure_eden_standalone(start_eden = True):
 
     run("export DEBIAN_FRONTEND='noninteractive' && dpkg-reconfigure postfix")
 
-    # Setting up Sahana
-    run('cp /home/web2py/applications/eden/private/templates/000_config.py /home/web2py/applications/eden/models')
-    run('sed -i "s|EDITING_CONFIG_FILE = False|EDITING_CONFIG_FILE = True|" /home/web2py/applications/eden/models/000_config.py')
-    run('sed -i "s|#settings.base.public_url|settings.base.public_url|" /home/web2py/applications/eden/models/000_config.py')
-    run('sed -i "s|127.0.0.1:8000|'+hostname+'.'+domain+'|" /home/web2py/applications/eden/models/000_config.py')
-    run('sed -i "s|#settings.base.cdn|settings.base.cdn|" /home/web2py/applications/eden/models/000_config.py')
-    run('sed -i "s|settings.base.template = \"default\"|settings.base.template = "'+template+'"|" /home/web2py/applications/eden/models/000_config.py')
 
     #Postgres
     run('echo "CREATE USER sahana WITH PASSWORD \''+password+'\';" > /tmp/pgpass.sql')
@@ -219,6 +214,14 @@ def configure_eden_standalone(start_eden = True):
     sudo('psql -q -d sahana -f /usr/share/postgresql/8.4/contrib/postgis-1.5/spatial_ref_sys.sql', user='postgres')
     sudo('psql -q -d sahana -c \'grant all on geometry_columns to sahana;\'', user='postgres')
     sudo('psql -q -d sahana -c \'grant all on spatial_ref_sys to sahana;\'', user='postgres')
+
+    # Setting up Sahana
+    run('cp /home/web2py/applications/eden/private/templates/000_config.py /home/web2py/applications/eden/models')
+    run('sed -i "s|EDITING_CONFIG_FILE = False|EDITING_CONFIG_FILE = True|" /home/web2py/applications/eden/models/000_config.py')
+    run('sed -i "s|#settings.base.public_url|settings.base.public_url|" /home/web2py/applications/eden/models/000_config.py')
+    run('sed -i "s|127.0.0.1:8000|'+hostname+'.'+domain+'|" /home/web2py/applications/eden/models/000_config.py')
+    run('sed -i "s|#settings.base.cdn|settings.base.cdn|" /home/web2py/applications/eden/models/000_config.py')
+    run('sed -i "s|settings.base.template = \"default\"|settings.base.template = "'+template+'"|" /home/web2py/applications/eden/models/000_config.py')
 
     # Configure Database
     run('sed -i \'s|#settings.database.db_type = "postgres"|settings.database.db_type = "postgres"|\' /home/web2py/applications/eden/models/000_config.py')
@@ -268,7 +271,7 @@ def aws_spawn(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
     print 'Starting an EC2 instance of type {0} with image {1}'.format(INSTANCE_TYPE, IMAGE)
     reservation = ec2_conn.run_instances(IMAGE, instance_type=INSTANCE_TYPE, key_name=KEY_NAME, placement=ZONE, security_groups=SECURITY_GROUPS, instance_initiated_shutdown_behavior=TERMINATION_BEHAVIOR)
     instance = reservation.instances[0]
-    ec2_conn.create_tags([instance.id], {"name": NAME})
+    ec2_conn.create_tags([instance.id], {"Name": NAME})
     print 'Checking if instance: {0} is running'.format(instance.dns_name)
 
     while not instance.update() == 'running':
@@ -277,6 +280,7 @@ def aws_spawn(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
 
     print 'Started the instance: {0}'.format(instance.dns_name)
     return instance.dns_name
+
 
 def aws_list(ZONE = 'us-east-1b'):
 
@@ -292,6 +296,7 @@ def aws_list(ZONE = 'us-east-1b'):
             for instance in reservation.instances:
                 print str(instance)+" state: "+str(instance.state)
         print "\n"
+
 
 def aws_clean(ZONE = 'us-east-1b'):
 
@@ -309,6 +314,7 @@ def aws_clean(ZONE = 'us-east-1b'):
                 if raw_input("TERMINATE INSTANCE " + str(instance) +" Y/N : ") == "Y":
                     instance.terminate()
     print "\n"
+
 
 def aws_postgres(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
             INSTANCE_TYPE = 't1.micro', 
@@ -332,7 +338,7 @@ def aws_postgres(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
     print 'Eden Postgres now installed and running at {0}'.format(machine)
     return machine
 
-    
+
 def aws_eden_standalone(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
             INSTANCE_TYPE = 't1.micro', 
             ZONE = 'us-east-1b',
@@ -353,3 +359,17 @@ def aws_eden_standalone(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image
     print 'Eden standalone now installed and running at {0}'.format(machine)
     return machine
     
+def aws_import_key(key_name, public_key, ZONE='us-east-1b'): 
+    # DSA keys not supported
+    # 1024, 2048, and 4096 key lengths accepted.
+
+    regions = boto.ec2.regions()
+    for region in regions:
+        if region.name in ZONE:
+            ec2_conn = region.connect()
+
+    public_key_material = open(public_key,'r').read()
+    ec2_conn.import_key_pair(key_name, public_key_material)
+
+
+
