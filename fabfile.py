@@ -160,7 +160,7 @@ def install_postgres():
                     "ptop"])
 
     put('configs/sysctl.conf','/tmp') #Postgres configs
-    run('echo /tmp/sysctl.conf >> /etc/sysctl.conf')
+    run('cat /tmp/sysctl.conf >> /etc/sysctl.conf')
     run('sysctl -w kernel.shmmax=279134208') # For 512MB RAM
     #run('sysctl -w kernel.shmmax=552992768') # For 512MB RAM
     run('sysctl -w kernel.shmall=2097152')
@@ -204,8 +204,6 @@ def setup_tsung():
     with cd('/root/tsung-1.4.2'): 
         run('./configure')
         run('make && make install')
-    with settings(warn_only=True):
-       run('useradd -M tsung')
     run("echo 'StrictHostKeyChecking no' >> /etc/ssh/ssh_config")
 
 
@@ -419,7 +417,7 @@ def aws_import_key(key_name, public_key, ZONE='us-east-1b'):
     public_key_material = open(public_key,'r').read()
     ec2_conn.import_key_pair(key_name, public_key_material)
 
-def aws_create_security_group(name, description='None', ports=[80,22,443],  ZONE='us-east-1b'):
+def aws_create_security_group(name, description='None', ports=[80,22,161,443],  ZONE='us-east-1b'):
     # This function creates security groups with access to the ports from *ALL* ips.
 
     regions = boto.ec2.regions()
