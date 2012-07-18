@@ -294,6 +294,7 @@ def run_tsung(xml, target, run_name=''):
     run('gzip '+logdir+'.tar')
     get(logdir+'.tar.gz','.')
 
+@parallel
 def aws_spawn(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
             INSTANCE_TYPE = 't1.micro', 
             ZONE = 'us-east-1b',
@@ -322,7 +323,7 @@ def aws_spawn(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
     print 'Started the instance: {0}'.format(instance.dns_name)
     return instance.dns_name
 
-
+@parallel
 def aws_list(ZONE = 'us-east-1b'):
 
     regions = boto.ec2.regions()
@@ -345,7 +346,7 @@ def aws_list(ZONE = 'us-east-1b'):
                 print "*****************************"
             print "\n"
 
-
+@parallel
 def aws_clean(ZONE = 'us-east-1b'):
 
     regions = boto.ec2.regions()
@@ -363,7 +364,7 @@ def aws_clean(ZONE = 'us-east-1b'):
                     instance.terminate()
     print "\n"
 
-
+@parallel
 def aws_postgres(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
             INSTANCE_TYPE = 't1.micro', 
             ZONE = 'us-east-1b',
@@ -386,7 +387,7 @@ def aws_postgres(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
     print 'Eden Postgres now installed and running at {0}'.format(machine)
     return machine
 
-
+@parallel
 def aws_eden_standalone(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
             INSTANCE_TYPE = 't1.micro', 
             ZONE = 'us-east-1b',
@@ -406,7 +407,8 @@ def aws_eden_standalone(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image
     configure_eden_standalone()
     print 'Eden standalone now installed and running at {0}'.format(machine)
     return machine
-    
+
+@parallel    
 def aws_tsung(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
             INSTANCE_TYPE = 't1.micro', 
             ZONE = 'us-east-1b',
@@ -426,6 +428,7 @@ def aws_tsung(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
     print 'Tsung now installed and running at {0}'.format(machine)
     return machine    
 
+@parallel
 def aws_import_key(key_name, public_key, ZONE='us-east-1b'): 
     # DSA keys not supported
     # 1024, 2048, and 4096 key lengths accepted.
@@ -438,6 +441,7 @@ def aws_import_key(key_name, public_key, ZONE='us-east-1b'):
     public_key_material = open(public_key,'r').read()
     ec2_conn.import_key_pair(key_name, public_key_material)
 
+@parallel
 def aws_create_security_group(name, description='None', ports=[80,22,161,443], ZONE='us-east-1b'):
     # This function creates security groups with access to the ports from *ALL* ips.
 
@@ -451,6 +455,7 @@ def aws_create_security_group(name, description='None', ports=[80,22,161,443], Z
     for port in ports:
         security_group.authorize('tcp',port,port,'0.0.0.0/0')
 
+@parallel
 def aws_create_image(instance_id, name, description=None, no_reboot=False, ZONE='us-east-1b'):
     """Wrapper around boto's create_image"""
 
@@ -465,6 +470,7 @@ def aws_create_image(instance_id, name, description=None, no_reboot=False, ZONE=
 
     return image_id
 
+@parallel
 def aws_delete_image(image_id, ZONE='us-east-1b'):
     """Deletes the AMI and the EBS snapshot associated with the image_id"""
 
