@@ -279,6 +279,20 @@ def configure_eden_standalone(start_eden = True):
 
     print "Done."
 
+def run_tsung(xml, target, run_name=''):
+    """Runs tsung tests with a given xml against the given target - Replaces localhost in the xml with the target and fetches the reports dir."""
+    #fab -i awskey.pem -u root -H machine_with_tsung run_tsung:xml=tsung-tests/test.xml,target=machine_to_test_against
+    put(xml,'current_test.xml')
+    run("sed -i 's|targetmachine|"+target+"|' current_test.xml")
+    from time import gmtime, strftime
+    logdir = run_name+strftime("%Y%m%d%H%M%S",gmtime())
+    run('mkdir '+logdir)
+    run("tsung -f current_test.xml -l "+logdir+' start')
+    with cd(os.path.join(logdir,strftime("%Y*",gmtime()))):
+        run('/usr/lib/tsung/bin/tsung_stats.pl')
+    run('tar -cf '+logdir+'.tar '+logdir)
+    run('gzip '+logdir+'.tar')
+    get(logdir+'.tar.gz','.')
 
 def aws_spawn(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
             INSTANCE_TYPE = 't1.micro', 
