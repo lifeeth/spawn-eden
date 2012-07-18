@@ -334,9 +334,15 @@ def aws_list(ZONE = 'us-east-1b'):
         if reservations:
             print "---------------------------------"
             print region
+            print "\n"
+            print "*****************************"
             for reservation in reservations:
                 for instance in reservation.instances:
-                    print str(instance)+" state: "+str(instance.state)
+                    print str(instance)
+                    print "State:"+str(instance.state)
+                    if instance.tags:
+                        print "Tags:" + str(instance.tags)
+                print "*****************************"
             print "\n"
 
 
@@ -432,7 +438,7 @@ def aws_import_key(key_name, public_key, ZONE='us-east-1b'):
     public_key_material = open(public_key,'r').read()
     ec2_conn.import_key_pair(key_name, public_key_material)
 
-def aws_create_security_group(name, description='None', ports=[80,22,161,443],  ZONE='us-east-1b'):
+def aws_create_security_group(name, description='None', ports=[80,22,161,443], ZONE='us-east-1b'):
     # This function creates security groups with access to the ports from *ALL* ips.
 
     regions = boto.ec2.regions()
@@ -444,3 +450,31 @@ def aws_create_security_group(name, description='None', ports=[80,22,161,443],  
 
     for port in ports:
         security_group.authorize('tcp',port,port,'0.0.0.0/0')
+
+def aws_create_image(instance_id, name, description=None, no_reboot=False, ZONE='us-east-1b'):
+    """Wrapper around boto's create_image"""
+
+    regions = boto.ec2.regions()
+    for region in regions:
+        if region.name in ZONE:
+            ec2_conn = region.connect()
+
+    image_id = ec2_conn.create_image(instance_id, name, description, no_reboot)
+
+    print image_id
+
+    return image_id
+
+def aws_delete_image(image_id, ZONE='us-east-1b'):
+    """Deletes the AMI and the EBS snapshot associated with the image_id"""
+
+    regions = boto.ec2.regions()
+    for region in regions:
+        if region.name in ZONE:
+            ec2_conn = region.connect()
+
+    return ec2_conn.deregister_image(image_id, delete_snapshot=True)
+
+
+
+
