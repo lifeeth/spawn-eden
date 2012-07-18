@@ -179,6 +179,35 @@ def install_memcached():
     """Installs memcached on the remote machine"""
     package_ensure(["memcached"])
 
+def setup_snmpd():
+    """Installs snmpd on a given host for monitoring. *NOTE* Allows everyone to connect"""
+    package_ensure('snmpd')
+    put('configs/snmpd.conf','/etc/snmp/snmpd.conf')
+    run('/etc/init.d/snmpd restart')
+
+def setup_tsung():
+    """Installs Tsung for Load testing"""
+    # Note that the SSH has StrictHostKeyChecking Disabled
+    setup_snmpd()
+    package_ensure(["erlang-nox",
+                    "erlang-dev",
+                    "gnuplot-nox",
+                    "libtemplate-perl",
+                    "make",
+                    "lrzsz",
+                    "wget",
+                    ])
+    run('rm -rf tsung-*')
+    run('wget http://tsung.erlang-projects.org/dist/tsung-1.4.2.tar.gz')
+    run('tar zxf tsung-1.4.2.tar.gz')
+    run('cd tsung-1.4.2')
+    with cd('/root/tsung-1.4.2'): 
+        run('./configure')
+        run('make && make install')
+    with settings(warn_only=True):
+       run('useradd -M tsung')
+    run("echo 'StrictHostKeyChecking no' >> /etc/ssh/ssh_config")
+
 
 def configure_eden_standalone(start_eden = True):
 
@@ -322,7 +351,7 @@ def aws_postgres(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
             SECURITY_GROUP = 'default', # Allow all ports
             KEY_NAME = 'awskey', # YOUR SSH KEY
             TERMINATION_BEHAVIOR = None,
-            NAME ='changeme'
+            NAME ='postgres'
     ):
     
     machine = aws_spawn(IMAGE,INSTANCE_TYPE,ZONE,SECURITY_GROUP,KEY_NAME,TERMINATION_BEHAVIOR,NAME)
@@ -359,6 +388,25 @@ def aws_eden_standalone(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image
     print 'Eden standalone now installed and running at {0}'.format(machine)
     return machine
     
+def aws_tsung(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
+            INSTANCE_TYPE = 't1.micro', 
+            ZONE = 'us-east-1b',
+            SECURITY_GROUP = 'default', # Allow all ports
+            KEY_NAME = 'awskey', # YOUR SSH KEY
+            TERMINATION_BEHAVIOR = None,
+            NAME ='tsung'
+    ):
+    machine = aws_spawn(IMAGE,INSTANCE_TYPE,ZONE,SECURITY_GROUP,KEY_NAME,TERMINATION_BEHAVIOR,NAME)
+    env.host_string = machine
+    env.user = 'root' # For AWS
+    env.key_filename = KEY_NAME+".pem"
+    print 'Sleeping for 60 seconds to let the machine spawn.'
+    time.sleep(60)
+    init_env()
+    setup_tsung()
+    print 'Tsung now installed and running at {0}'.format(machine)
+    return machine    
+
 def aws_import_key(key_name, public_key, ZONE='us-east-1b'): 
     # DSA keys not supported
     # 1024, 2048, and 4096 key lengths accepted.
