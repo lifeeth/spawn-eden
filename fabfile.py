@@ -326,17 +326,18 @@ def aws_spawn(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
 def aws_list(ZONE = 'us-east-1b'):
 
     regions = boto.ec2.regions()
+    print "You have the following instances:\n"
     for region in regions:
         ec2_conn = region.connect()
 
         reservations = ec2_conn.get_all_instances()
-        print "---------------------------------"
-        print region
-        print "You have the following instances:\n"
-        for reservation in reservations:
-            for instance in reservation.instances:
-                print str(instance)+" state: "+str(instance.state)
-        print "\n"
+        if reservations:
+            print "---------------------------------"
+            print region
+            for reservation in reservations:
+                for instance in reservation.instances:
+                    print str(instance)+" state: "+str(instance.state)
+            print "\n"
 
 
 def aws_clean(ZONE = 'us-east-1b'):
