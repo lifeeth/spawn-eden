@@ -13,6 +13,7 @@ branch = "git://github.com/flavour/eden.git"
 template = "default"
 
 def init_env():
+    """Initializes the Debian env to work with Cuisine."""
     run('apt-get -y update')
     run('apt-get -y upgrade')
     run('apt-get -y install aptitude sudo curl') # So that Cuisine plays nice
@@ -26,7 +27,8 @@ def init_env():
                     "rcconf",
                     "htop"])
 
-def setup_eden(): # By default setups postgres,uwsgi and cherokee
+def setup_eden(): 
+    """Sets up Postgres, uwsgi and Cherokee"""
     init_env()
     run('echo "deb http://apt.balocco.name squeeze main" >> /etc/apt/sources.list')
     run('curl http://apt.balocco.name/key.asc | apt-key add -')
@@ -89,7 +91,8 @@ def setup_eden(): # By default setups postgres,uwsgi and cherokee
     run('chmod +x /usr/local/bin/stop-uwsgi')
     run('/etc/init.d/cherokee stop')
 
-def drop_eden(path='/home'): # Web2py directory will be created within this directory.
+def drop_eden(path='/home'): 
+    """Installs packages necessary for Eden. Web2py is downloaded into the path and Eden dropped into it."""
     
     package_ensure(["git-core",
                     "libgeos-c1",
@@ -208,6 +211,7 @@ def setup_tsung():
 
 
 def configure_eden_standalone(start_eden = True):
+    """Configure an installed Eden - Postgres instance - This is to be run after installing Eden with other helpers provided."""
 
     domain = raw_input("What domain name should we use?  ")
     hostname = raw_input("What host name should we use?  ")
@@ -303,6 +307,7 @@ def aws_spawn(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
             TERMINATION_BEHAVIOR = None,
             NAME ='changeme',
             ):
+    """Spawns an AWS instance with the given specs."""
 
     env.key_filename = KEY_NAME+".pem"
     regions = boto.ec2.regions()
@@ -325,6 +330,7 @@ def aws_spawn(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
 
 @parallel
 def aws_list(ZONE = 'us-east-1b'):
+    """Lists out AWS instances launched in the specific reagion"""
 
     regions = boto.ec2.regions()
     print "You have the following instances:\n"
@@ -348,6 +354,7 @@ def aws_list(ZONE = 'us-east-1b'):
 
 @parallel
 def aws_clean(ZONE = 'us-east-1b'):
+    """Cleans AWS instances in the specific region."""
 
     regions = boto.ec2.regions()
     for region in regions:
@@ -373,6 +380,8 @@ def aws_postgres(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
             TERMINATION_BEHAVIOR = None,
             NAME ='postgres'
     ):
+    """Spawns an AWS instance and installs Postgres with Eden - The uwsgi Eden instance is not started. 
+        Eden install on this machine is used only for initilization of DB and migration."""
     
     machine = aws_spawn(IMAGE,INSTANCE_TYPE,ZONE,SECURITY_GROUP,KEY_NAME,TERMINATION_BEHAVIOR,NAME)
     env.host_string = machine
@@ -396,6 +405,7 @@ def aws_eden_standalone(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image
             TERMINATION_BEHAVIOR = None,
             NAME ='changeme'
     ):
+    """Spawns a standalone AWS instance of Eden with Postgres, uwsgi and Cherokee."""
     
     machine = aws_spawn(IMAGE,INSTANCE_TYPE,ZONE,SECURITY_GROUP,KEY_NAME,TERMINATION_BEHAVIOR,NAME)
     env.host_string = machine
@@ -417,6 +427,7 @@ def aws_tsung(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
             TERMINATION_BEHAVIOR = None,
             NAME ='tsung'
     ):
+    """Spawns an AWS instance with TSUNG set up to run load testing."""
     machine = aws_spawn(IMAGE,INSTANCE_TYPE,ZONE,SECURITY_GROUP,KEY_NAME,TERMINATION_BEHAVIOR,NAME)
     env.host_string = machine
     env.user = 'root' # For AWS
@@ -430,8 +441,8 @@ def aws_tsung(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
 
 @parallel
 def aws_import_key(key_name, public_key, ZONE='us-east-1b'): 
-    # DSA keys not supported
-    # 1024, 2048, and 4096 key lengths accepted.
+    """Imports a RSA key into AWS - public_key is the file path to the key to be uploaded.
+        - 1024, 2048, and 4096 key lengths accepted. """
 
     regions = boto.ec2.regions()
     for region in regions:
@@ -443,7 +454,7 @@ def aws_import_key(key_name, public_key, ZONE='us-east-1b'):
 
 @parallel
 def aws_create_security_group(name, description='None', ports=[80,22,161,443], ZONE='us-east-1b'):
-    # This function creates security groups with access to the ports from *ALL* ips.
+    """This function creates security groups with access to the ports given from *ALL* ips."""
 
     regions = boto.ec2.regions()
     for region in regions:
@@ -472,7 +483,12 @@ def aws_create_image(instance_id, name, description=None, no_reboot=False, ZONE=
 
 @parallel
 def aws_delete_image(image_id, ZONE='us-east-1b'):
-    """Deletes the AMI and the EBS snapshot associated with the image_id"""
+    """Deletes the AMI and the EBS snapshot associated with the image_id
+
+    Keyword Arguments:
+    image_id -- The image id of the image to AMI/EBS snapshot to delete.
+    ZONE -- The AWS zone in which the image_id is located (default us-east-1b)
+    """
 
     regions = boto.ec2.regions()
     for region in regions:
