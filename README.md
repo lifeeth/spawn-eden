@@ -1,1 +1,1 @@
-# [Check documentation here.](http://spawn-eden.rtfd.org){:target="_blank"}
+# [Check documentation here](http://spawn-eden.rtfd.org)
