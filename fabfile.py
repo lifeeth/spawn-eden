@@ -98,7 +98,11 @@ def setup_eden():
     run('/etc/init.d/cherokee stop')
 
 def drop_eden(path='/home'): 
-    """Installs packages necessary for Eden. Web2py is downloaded into the path and Eden dropped into it."""
+    """Installs packages necessary for Eden.
+ 
+    :param path: Path to the directory in which a Web2py directory along with Eden is created. **Default: '/home'**
+
+    """
     
     package_ensure(["git-core",
                     "libgeos-c1",
@@ -217,7 +221,11 @@ def setup_tsung():
 
 
 def configure_eden_standalone(start_eden = True):
-    """Configure an installed Eden - Postgres instance - This is to be run after installing Eden with other helpers provided."""
+    """Configure an installed Eden - Postgres instance - This is to be run after installing Eden with other helpers provided.
+
+    :param start_eden: Start uWSGI after configuring eden. **Default True**
+
+    """
 
     domain = raw_input("What domain name should we use?  ")
     hostname = raw_input("What host name should we use?  ")
@@ -296,8 +304,14 @@ def run_tsung(xml, target, run_name=''):
     :param target: The machine to run the test against.
     :param run_name: Prepend the log directory of tsung with this.
     :returns: A tar.gz of the logs directory.
+    
+    **Example Usage:**
+
+    .. code-block:: sh 
+    
+        fab -i awskey.pem -u root -H machine_with_tsung run_tsung:xml=tsung-tests/test.xml,target=machine_to_test_against
+
     """
-    #fab -i awskey.pem -u root -H machine_with_tsung run_tsung:xml=tsung-tests/test.xml,target=machine_to_test_against
     put(xml,'current_test.xml')
     run("sed -i 's|targetmachine|"+target+"|' current_test.xml")
     from time import gmtime, strftime
@@ -371,7 +385,11 @@ def aws_spawn(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
 
 @parallel
 def aws_list(ZONE = 'us-east-1b'):
-    """Lists out AWS instances launched in the specific reagion"""
+    """Lists out AWS instances launched in the specific region
+
+    :param ZONE: AWS Zone to list the instances from. **Default 'us-east-1b'**
+    
+    """
 
     regions = boto.ec2.regions()
     print "You have the following instances:\n"
@@ -395,7 +413,11 @@ def aws_list(ZONE = 'us-east-1b'):
 
 @parallel
 def aws_clean(ZONE = 'us-east-1b'):
-    """Cleans AWS instances in the specific region."""
+    """Cleans AWS instances in the specific region.
+
+    :param ZONE: AWS Zone to list the instances from. **Default 'us-east-1b'**
+
+    """
 
     regions = boto.ec2.regions()
     for region in regions:
@@ -425,6 +447,7 @@ def aws_postgres(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
         Eden install on this machine is used only for initilization of DB and migration.
 
         Arguments are same as those of :func:`fabfile.aws_spawn`
+
     """
     
     machine = aws_spawn(IMAGE,INSTANCE_TYPE,ZONE,SECURITY_GROUP,KEY_NAME,SHUTDOWN_BEHAVIOR,NAME)
@@ -452,6 +475,7 @@ def aws_eden_standalone(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image
     """Spawns a standalone AWS instance of Eden with Postgres, uwsgi and Cherokee.
 
        Arguments are same as those of :func:`fabfile.aws_spawn`
+
     """
     
     machine = aws_spawn(IMAGE,INSTANCE_TYPE,ZONE,SECURITY_GROUP,KEY_NAME,SHUTDOWN_BEHAVIOR,NAME)
@@ -477,6 +501,7 @@ def aws_tsung(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
     """Spawns an AWS instance with TSUNG set up to run load testing.
 
        Arguments are same as those of :func:`fabfile.aws_spawn`
+
     """
     machine = aws_spawn(IMAGE,INSTANCE_TYPE,ZONE,SECURITY_GROUP,KEY_NAME,SHUTDOWN_BEHAVIOR,NAME)
     env.host_string = machine
@@ -491,8 +516,13 @@ def aws_tsung(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
 
 @parallel
 def aws_import_key(key_name, public_key, ZONE='us-east-1b'): 
-    """Imports a RSA key into AWS - public_key is the file path to the key to be uploaded.
-        - 1024, 2048, and 4096 key lengths accepted. """
+    """Imports a RSA key into AWS 
+
+    :param key_name: Name to store this key as in AWS.
+    :param public_key: Path to the key file to be uploaded. **Note:** only 1024, 2048, and 4096 key lengths RSA accepted. 
+    :param ZONE: AWS Zone to list the instances from. **Default 'us-east-1b'**
+
+    """
 
     regions = boto.ec2.regions()
     for region in regions:
@@ -504,7 +534,14 @@ def aws_import_key(key_name, public_key, ZONE='us-east-1b'):
 
 @parallel
 def aws_create_security_group(name, description='None', ports=[80,22,161,443], ZONE='us-east-1b'):
-    """This function creates security groups with access to the ports given from *ALL* ips."""
+    """This function creates security groups with access to the ports given from **ALL** ips.
+
+    :param name: Name of the new security group we are creating.
+    :param description: Description for the new security group we are creating. **Default 'None'**
+    :param ports: List containing ports to allow access from all ips. **Default [80,22,161,443]**
+    :param ZONE: AWS Zone to list the instances from. **Default 'us-east-1b'**
+
+    """
 
     regions = boto.ec2.regions()
     for region in regions:
@@ -518,7 +555,15 @@ def aws_create_security_group(name, description='None', ports=[80,22,161,443], Z
 
 @parallel
 def aws_create_image(instance_id, name, description=None, no_reboot=False, ZONE='us-east-1b'):
-    """Wrapper around boto's create_image"""
+    """Wrapper around boto's create_image
+
+    :param instance_id: ID of the Instance to create an image from.
+    :param name: Name of the Image.
+    :param description: Description for the Image created. **Default None**
+    :param no_reboot: Shutdown the instance with the given instance_id while creating the image. **Default False**
+    :param ZONE: AWS Zone to list the instances from. **Default 'us-east-1b'**
+
+    """
 
     regions = boto.ec2.regions()
     for region in regions:
