@@ -6,3 +6,4 @@ awskey.pem
 *.~*~
 .directory
 *.swp
+doc/_build/*

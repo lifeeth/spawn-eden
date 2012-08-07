@@ -1,3 +1,9 @@
+""" **Sahana Eden deployment script**
+
+.. moduleauthor:: Praneeth Bodduluri <praneeth@bufferlabs.in>
+
+"""
+
 from __future__ import with_statement
 from fabric.api import *
 from cuisine import *
@@ -183,7 +189,7 @@ def install_memcached():
     package_ensure(["memcached"])
 
 def setup_snmpd():
-    """Installs snmpd on a given host for monitoring. *NOTE* Allows everyone to connect"""
+    """Installs snmpd on a given host for monitoring. **NOTE: Allows everyone to connect**"""
     package_ensure('snmpd')
     put('configs/snmpd.conf','/etc/snmp/snmpd.conf')
     run('/etc/init.d/snmpd restart')
@@ -284,7 +290,13 @@ def configure_eden_standalone(start_eden = True):
     print "Done."
 
 def run_tsung(xml, target, run_name=''):
-    """Runs tsung tests with a given xml against the given target - Replaces localhost in the xml with the target and fetches the reports dir."""
+    """Runs tsung tests with a given xml against the given target - Replaces localhost in the xml with the target and fetches the reports dir.
+
+    :param xml: The path to the xml file to upload.
+    :param target: The machine to run the test against.
+    :param run_name: Prepend the log directory of tsung with this.
+    :returns: A tar.gz of the logs directory.
+    """
     #fab -i awskey.pem -u root -H machine_with_tsung run_tsung:xml=tsung-tests/test.xml,target=machine_to_test_against
     put(xml,'current_test.xml')
     run("sed -i 's|targetmachine|"+target+"|' current_test.xml")
@@ -304,10 +316,39 @@ def aws_spawn(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
             ZONE = 'us-east-1b',
             SECURITY_GROUP = 'default', # Allow all ports
             KEY_NAME = 'awskey', # YOUR SSH KEY
-            TERMINATION_BEHAVIOR = None,
+            SHUTDOWN_BEHAVIOR = None,
             NAME ='changeme',
             ):
-    """Spawns an AWS instance with the given specs."""
+    """Spawns an AWS instance with the given specs.
+
+    :param IMAGE: The AMI to spawn **Default - 'ami-cb66b2a2'**
+    :param INSTANCE_TYPE: The type of instance to run.  **Default - 't1.micro'**
+         
+        Following options are allowed:
+            - m1.small
+            - m1.large
+            - m1.xlarge
+            - c1.medium
+            - c1.xlarge
+            - m2.xlarge
+            - m2.2xlarge
+            - m2.4xlarge
+            - cc1.4xlarge
+            - t1.micro
+
+    :param ZONE: The Zone to spawn the IMAGE. **NOTE:** The IMAGE AMI should exist in the ZONE selected. **Default - 'us-east-1b'**
+    :param SECURITY_GROUP: The security group to set this AMI up with. **Default - 'default'**
+    :param KEY_NAME: The SSH key to set this AMI up with. **Default - 'awskey'**
+    :param SHUTDOWN_BEHAVIOR:  Specifies whether the instance stops or terminates on instance-initiated shutdown. **Default - stop**
+
+        Valid values are:
+            - stop
+            - terminate
+        
+    
+    :param NAME: Set the key "Name" with this value. **Default - 'changeme'**
+
+    """
 
     env.key_filename = KEY_NAME+".pem"
     regions = boto.ec2.regions()
@@ -316,7 +357,7 @@ def aws_spawn(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
             ec2_conn = region.connect()
 
     print 'Starting an EC2 instance of type {0} with image {1}'.format(INSTANCE_TYPE, IMAGE)
-    reservation = ec2_conn.run_instances(IMAGE, instance_type=INSTANCE_TYPE, key_name=KEY_NAME, placement=ZONE, security_groups=[SECURITY_GROUP], instance_initiated_shutdown_behavior=TERMINATION_BEHAVIOR)
+    reservation = ec2_conn.run_instances(IMAGE, instance_type=INSTANCE_TYPE, key_name=KEY_NAME, placement=ZONE, security_groups=[SECURITY_GROUP], instance_initiated_shutdown_behavior=SHUTDOWN_BEHAVIOR)
     instance = reservation.instances[0]
     ec2_conn.create_tags([instance.id], {"Name": NAME})
     print 'Checking if instance: {0} is running'.format(instance.dns_name)
@@ -377,13 +418,16 @@ def aws_postgres(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
             ZONE = 'us-east-1b',
             SECURITY_GROUP = 'default', # Allow all ports
             KEY_NAME = 'awskey', # YOUR SSH KEY
-            TERMINATION_BEHAVIOR = None,
+            SHUTDOWN_BEHAVIOR = None,
             NAME ='postgres'
     ):
     """Spawns an AWS instance and installs Postgres with Eden - The uwsgi Eden instance is not started. 
-        Eden install on this machine is used only for initilization of DB and migration."""
+        Eden install on this machine is used only for initilization of DB and migration.
+
+        Arguments are same as those of :func:`fabfile.aws_spawn`
+    """
     
-    machine = aws_spawn(IMAGE,INSTANCE_TYPE,ZONE,SECURITY_GROUP,KEY_NAME,TERMINATION_BEHAVIOR,NAME)
+    machine = aws_spawn(IMAGE,INSTANCE_TYPE,ZONE,SECURITY_GROUP,KEY_NAME,SHUTDOWN_BEHAVIOR,NAME)
     env.host_string = machine
     env.user = 'root' # For AWS
     env.key_filename = KEY_NAME+".pem"
@@ -402,12 +446,15 @@ def aws_eden_standalone(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image
             ZONE = 'us-east-1b',
             SECURITY_GROUP = 'default', # Allow all ports
             KEY_NAME = 'awskey', # YOUR SSH KEY
-            TERMINATION_BEHAVIOR = None,
+            SHUTDOWN_BEHAVIOR = None,
             NAME ='changeme'
     ):
-    """Spawns a standalone AWS instance of Eden with Postgres, uwsgi and Cherokee."""
+    """Spawns a standalone AWS instance of Eden with Postgres, uwsgi and Cherokee.
+
+       Arguments are same as those of :func:`fabfile.aws_spawn`
+    """
     
-    machine = aws_spawn(IMAGE,INSTANCE_TYPE,ZONE,SECURITY_GROUP,KEY_NAME,TERMINATION_BEHAVIOR,NAME)
+    machine = aws_spawn(IMAGE,INSTANCE_TYPE,ZONE,SECURITY_GROUP,KEY_NAME,SHUTDOWN_BEHAVIOR,NAME)
     env.host_string = machine
     env.user = 'root' # For AWS
     env.key_filename = KEY_NAME+".pem"
@@ -424,11 +471,14 @@ def aws_tsung(IMAGE='ami-cb66b2a2', # Debian Squeeze 32 bit base image.
             ZONE = 'us-east-1b',
             SECURITY_GROUP = 'default', # Allow all ports
             KEY_NAME = 'awskey', # YOUR SSH KEY
-            TERMINATION_BEHAVIOR = None,
+            SHUTDOWN_BEHAVIOR = None,
             NAME ='tsung'
     ):
-    """Spawns an AWS instance with TSUNG set up to run load testing."""
-    machine = aws_spawn(IMAGE,INSTANCE_TYPE,ZONE,SECURITY_GROUP,KEY_NAME,TERMINATION_BEHAVIOR,NAME)
+    """Spawns an AWS instance with TSUNG set up to run load testing.
+
+       Arguments are same as those of :func:`fabfile.aws_spawn`
+    """
+    machine = aws_spawn(IMAGE,INSTANCE_TYPE,ZONE,SECURITY_GROUP,KEY_NAME,SHUTDOWN_BEHAVIOR,NAME)
     env.host_string = machine
     env.user = 'root' # For AWS
     env.key_filename = KEY_NAME+".pem"
@@ -485,9 +535,9 @@ def aws_create_image(instance_id, name, description=None, no_reboot=False, ZONE=
 def aws_delete_image(image_id, ZONE='us-east-1b'):
     """Deletes the AMI and the EBS snapshot associated with the image_id
 
-    Keyword Arguments:
-    image_id -- The image id of the image to AMI/EBS snapshot to delete.
-    ZONE -- The AWS zone in which the image_id is located (default us-east-1b)
+    :param image_id: The image id of the image to AMI/EBS snapshot to delete.
+    :param ZONE: The AWS zone in which the image_id is located. **Default: 'us-east-1b'**
+
     """
 
     regions = boto.ec2.regions()
