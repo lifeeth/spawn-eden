@@ -1,0 +1,439 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Welcome to Spawn Eden’s documentation! &mdash; Spawn Eden 0.1a documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1a',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Spawn Eden 0.1a documentation" href="#" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="#">Spawn Eden 0.1a documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="welcome-to-spawn-eden-s-documentation">
+<h1>Welcome to Spawn Eden&#8217;s documentation!<a class="headerlink" href="#welcome-to-spawn-eden-s-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="getting-started">
+<h2>Getting started:<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul>
+<li><p class="first">We recommend a virtualenv for using these scripts.</p>
+</li>
+<li><p class="first">Install the dependencies for the scripts - Fabric and Cuisine.</p>
+<div class="highlight-bash"><div class="highlight"><pre>pip install -r requirements.txt
+</pre></div>
+</div>
+</li>
+<li><p class="first">Use the following commands to install and configure a standalone Eden instance.</p>
+<p><strong>Install :</strong></p>
+<div class="highlight-bash"><div class="highlight"><pre>fab -H targetmachine setup_eden_standalone
+</pre></div>
+</div>
+<p><strong>Configure :</strong></p>
+<div class="highlight-bash"><div class="highlight"><pre>fab -H targetmachine configure_eden_standalone
+</pre></div>
+</div>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="getting-started-with-amazon-ec2">
+<h2>Getting started with Amazon EC2:<a class="headerlink" href="#getting-started-with-amazon-ec2" title="Permalink to this headline">¶</a></h2>
+<p>The following illustrates the procedure to spawn a standalone Sahana Eden instance on EC2.</p>
+<blockquote>
+<div><ul>
+<li><p class="first">Create a file called <strong>.boto</strong> in your home directory with the following contents with the access key and the secret access key as per your account.</p>
+<div class="highlight-none"><div class="highlight"><pre>[Credentials]
+aws_access_key_id = REPLACE_ME_WITH_ACCESS_KEY
+aws_secret_access_key = REPLACE_ME_WITH_SECRET_ACCESS_KEY
+</pre></div>
+</div>
+</li>
+<li><p class="first">Upload your public key to be used with the instances created with EC2.</p>
+<div class="highlight-none"><div class="highlight"><pre>fab aws_import_key:key_name=awskey,public_key=path_to_your_public_key,ZONE=&#39;us-east-1b&#39;
+</pre></div>
+</div>
+</li>
+<li><p class="first">Create a security group to be used with the instances spawned with EC2.</p>
+<div class="highlight-none"><div class="highlight"><pre>fab aws_create_security_group:name=default,ZONE=&#39;us-east-1b&#39;
+</pre></div>
+</div>
+</li>
+<li><p class="first">Create a standalone Sahana Eden instance.</p>
+<div class="highlight-none"><div class="highlight"><pre>fab aws_eden_standalone
+</pre></div>
+</div>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="fabfile-documentation">
+<h2>Fabfile Documentation<a class="headerlink" href="#fabfile-documentation" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul class="simple">
+</ul>
+</div>
+<span class="target" id="module-fabfile"></span><p><strong>Sahana Eden deployment script</strong></p>
+<dl class="function">
+<dt id="fabfile.aws_clean">
+<tt class="descclassname">fabfile.</tt><tt class="descname">aws_clean</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#fabfile.aws_clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleans AWS instances in the specific region.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ZONE</strong> &#8211; AWS Zone to list the instances from. <strong>Default &#8216;us-east-1b&#8217;</strong></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabfile.aws_create_image">
+<tt class="descclassname">fabfile.</tt><tt class="descname">aws_create_image</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#fabfile.aws_create_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper around boto&#8217;s create_image</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>instance_id</strong> &#8211; ID of the Instance to create an image from.</li>
+<li><strong>name</strong> &#8211; Name of the Image.</li>
+<li><strong>description</strong> &#8211; Description for the Image created. <strong>Default None</strong></li>
+<li><strong>no_reboot</strong> &#8211; Shutdown the instance with the given instance_id while creating the image. <strong>Default False</strong></li>
+<li><strong>ZONE</strong> &#8211; AWS Zone to list the instances from. <strong>Default &#8216;us-east-1b&#8217;</strong></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabfile.aws_create_security_group">
+<tt class="descclassname">fabfile.</tt><tt class="descname">aws_create_security_group</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#fabfile.aws_create_security_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function creates security groups with access to the ports given from <strong>ALL</strong> ips.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> &#8211; Name of the new security group we are creating.</li>
+<li><strong>description</strong> &#8211; Description for the new security group we are creating. <strong>Default &#8216;None&#8217;</strong></li>
+<li><strong>ports</strong> &#8211; List containing ports to allow access from all ips. <strong>Default [80,22,161,443]</strong></li>
+<li><strong>ZONE</strong> &#8211; AWS Zone to list the instances from. <strong>Default &#8216;us-east-1b&#8217;</strong></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabfile.aws_delete_image">
+<tt class="descclassname">fabfile.</tt><tt class="descname">aws_delete_image</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#fabfile.aws_delete_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes the AMI and the EBS snapshot associated with the image_id</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>image_id</strong> &#8211; The image id of the image to AMI/EBS snapshot to delete.</li>
+<li><strong>ZONE</strong> &#8211; The AWS zone in which the image_id is located. <strong>Default: &#8216;us-east-1b&#8217;</strong></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabfile.aws_eden_standalone">
+<tt class="descclassname">fabfile.</tt><tt class="descname">aws_eden_standalone</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#fabfile.aws_eden_standalone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spawns a standalone AWS instance of Eden with Postgres, uwsgi and Cherokee.</p>
+<p>Arguments are same as those of <a class="reference internal" href="#fabfile.aws_spawn" title="fabfile.aws_spawn"><tt class="xref py py-func docutils literal"><span class="pre">fabfile.aws_spawn()</span></tt></a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabfile.aws_import_key">
+<tt class="descclassname">fabfile.</tt><tt class="descname">aws_import_key</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#fabfile.aws_import_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imports a RSA key into AWS</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>key_name</strong> &#8211; Name to store this key as in AWS.</li>
+<li><strong>public_key</strong> &#8211; Path to the key file to be uploaded. <strong>Note:</strong> only 1024, 2048, and 4096 key lengths RSA accepted.</li>
+<li><strong>ZONE</strong> &#8211; AWS Zone to list the instances from. <strong>Default &#8216;us-east-1b&#8217;</strong></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabfile.aws_list">
+<tt class="descclassname">fabfile.</tt><tt class="descname">aws_list</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#fabfile.aws_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lists out AWS instances launched in the specific region</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ZONE</strong> &#8211; AWS Zone to list the instances from. <strong>Default &#8216;us-east-1b&#8217;</strong></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabfile.aws_postgres">
+<tt class="descclassname">fabfile.</tt><tt class="descname">aws_postgres</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#fabfile.aws_postgres" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spawns an AWS instance and installs Postgres with Eden - The uwsgi Eden instance is not started. 
+Eden install on this machine is used only for initilization of DB and migration.</p>
+<p>Arguments are same as those of <a class="reference internal" href="#fabfile.aws_spawn" title="fabfile.aws_spawn"><tt class="xref py py-func docutils literal"><span class="pre">fabfile.aws_spawn()</span></tt></a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabfile.aws_spawn">
+<tt class="descclassname">fabfile.</tt><tt class="descname">aws_spawn</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#fabfile.aws_spawn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spawns an AWS instance with the given specs.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>IMAGE</strong> &#8211; The AMI to spawn <strong>Default - &#8216;ami-cb66b2a2&#8217;</strong></li>
+<li><strong>INSTANCE_TYPE</strong> &#8211; <p>The type of instance to run.  <strong>Default - &#8216;t1.micro&#8217;</strong></p>
+<dl class="docutils">
+<dt>Following options are allowed:</dt>
+<dd><ul class="first last">
+<li>m1.small</li>
+<li>m1.large</li>
+<li>m1.xlarge</li>
+<li>c1.medium</li>
+<li>c1.xlarge</li>
+<li>m2.xlarge</li>
+<li>m2.2xlarge</li>
+<li>m2.4xlarge</li>
+<li>cc1.4xlarge</li>
+<li>t1.micro</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><strong>ZONE</strong> &#8211; The Zone to spawn the IMAGE. <strong>NOTE:</strong> The IMAGE AMI should exist in the ZONE selected. <strong>Default - &#8216;us-east-1b&#8217;</strong></li>
+<li><strong>SECURITY_GROUP</strong> &#8211; The security group to set this AMI up with. <strong>Default - &#8216;default&#8217;</strong></li>
+<li><strong>KEY_NAME</strong> &#8211; The SSH key to set this AMI up with. <strong>Default - &#8216;awskey&#8217;</strong></li>
+<li><strong>SHUTDOWN_BEHAVIOR</strong> &#8211; <p>Specifies whether the instance stops or terminates on instance-initiated shutdown. <strong>Default - stop</strong></p>
+<dl class="docutils">
+<dt>Valid values are:</dt>
+<dd><ul class="first last">
+<li>stop</li>
+<li>terminate</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><strong>NAME</strong> &#8211; Set the key &#8220;Name&#8221; with this value. <strong>Default - &#8216;changeme&#8217;</strong></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabfile.aws_tsung">
+<tt class="descclassname">fabfile.</tt><tt class="descname">aws_tsung</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#fabfile.aws_tsung" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spawns an AWS instance with TSUNG set up to run load testing.</p>
+<p>Arguments are same as those of <a class="reference internal" href="#fabfile.aws_spawn" title="fabfile.aws_spawn"><tt class="xref py py-func docutils literal"><span class="pre">fabfile.aws_spawn()</span></tt></a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabfile.configure_eden_standalone">
+<tt class="descclassname">fabfile.</tt><tt class="descname">configure_eden_standalone</tt><big>(</big><em>start_eden=True</em><big>)</big><a class="headerlink" href="#fabfile.configure_eden_standalone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure an installed Eden - Postgres instance - This is to be run after installing Eden with other helpers provided.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>start_eden</strong> &#8211; Start uWSGI after configuring eden. <strong>Default True</strong></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabfile.drop_eden">
+<tt class="descclassname">fabfile.</tt><tt class="descname">drop_eden</tt><big>(</big><em>path='/home'</em><big>)</big><a class="headerlink" href="#fabfile.drop_eden" title="Permalink to this definition">¶</a></dt>
+<dd><p>Installs packages necessary for Eden.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> &#8211; Path to the directory in which a Web2py directory along with Eden is created. <strong>Default: &#8216;/home&#8217;</strong></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabfile.init_env">
+<tt class="descclassname">fabfile.</tt><tt class="descname">init_env</tt><big>(</big><big>)</big><a class="headerlink" href="#fabfile.init_env" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes the Debian env to work with Cuisine.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabfile.install_memcached">
+<tt class="descclassname">fabfile.</tt><tt class="descname">install_memcached</tt><big>(</big><big>)</big><a class="headerlink" href="#fabfile.install_memcached" title="Permalink to this definition">¶</a></dt>
+<dd><p>Installs memcached on the remote machine</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabfile.install_postgres">
+<tt class="descclassname">fabfile.</tt><tt class="descname">install_postgres</tt><big>(</big><big>)</big><a class="headerlink" href="#fabfile.install_postgres" title="Permalink to this definition">¶</a></dt>
+<dd><p>Install Postgres on a remote machine</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabfile.run_tsung">
+<tt class="descclassname">fabfile.</tt><tt class="descname">run_tsung</tt><big>(</big><em>xml</em>, <em>target</em>, <em>run_name=''</em><big>)</big><a class="headerlink" href="#fabfile.run_tsung" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs tsung tests with a given xml against the given target - Replaces localhost in the xml with the target and fetches the reports dir.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>xml</strong> &#8211; The path to the xml file to upload.</li>
+<li><strong>target</strong> &#8211; The machine to run the test against.</li>
+<li><strong>run_name</strong> &#8211; Prepend the log directory of tsung with this.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A tar.gz of the logs directory.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example Usage:</strong></p>
+<div class="highlight-sh"><div class="highlight"><pre>fab -i awskey.pem -u root -H machine_with_tsung run_tsung:xml<span class="o">=</span>tsung-tests/test.xml,target<span class="o">=</span>machine_to_test_against
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabfile.setup_eden">
+<tt class="descclassname">fabfile.</tt><tt class="descname">setup_eden</tt><big>(</big><big>)</big><a class="headerlink" href="#fabfile.setup_eden" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets up Postgres, uwsgi and Cherokee</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabfile.setup_snmpd">
+<tt class="descclassname">fabfile.</tt><tt class="descname">setup_snmpd</tt><big>(</big><big>)</big><a class="headerlink" href="#fabfile.setup_snmpd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Installs snmpd on a given host for monitoring. <strong>NOTE: Allows everyone to connect</strong></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fabfile.setup_tsung">
+<tt class="descclassname">fabfile.</tt><tt class="descname">setup_tsung</tt><big>(</big><big>)</big><a class="headerlink" href="#fabfile.setup_tsung" title="Permalink to this definition">¶</a></dt>
+<dd><p>Installs Tsung for Load testing</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to Spawn Eden&#8217;s documentation!</a><ul>
+<li><a class="reference internal" href="#getting-started">Getting started:</a></li>
+<li><a class="reference internal" href="#getting-started-with-amazon-ec2">Getting started with Amazon EC2:</a></li>
+<li><a class="reference internal" href="#fabfile-documentation">Fabfile Documentation</a><ul>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="#">Spawn Eden 0.1a documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Praneeth Bodduluri.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
