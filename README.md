@@ -1,3 +1,1 @@
-# Sahana Eden Deployment Scripts
-
-[Check documentation here.](http://spawn-eden.rtfd.org)
+# [Check documentation here.](http://spawn-eden.rtfd.org){:target="_blank"}
