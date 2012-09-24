@@ -12,7 +12,7 @@
   <server host="localhost" port="8000" type="tcp"></server>
 </servers>
 
- <load duration="1" unit="minute">
+ <load duration="5" unit="minute">
    <arrivalphase phase="1" duration="1" unit="minute">
      <users maxnumber="1" arrivalrate="1" unit="second"></users>
    </arrivalphase>
@@ -62,12 +62,12 @@
 <request><http url='/eden/static/img/jquery-ui/ui-anim_basic_16x16.gif' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:55 GMT' method='GET'></http></request>
 
 
-<thinktime random='true' value='64'/>
+<thinktime random='true' value='1'/>
 
 <!-- Visit Login page -->
         <request>
             <!-- Collect the formkey from the registration form (not the sign-in form!) -->
-            <dyn_variable name="_formkey" xpath="//input[@name='_fromkey'][1]/@value" />
+            <dyn_variable name="_formkey" xpath="//input[@name='_formkey'][1]/@value" />
             <http url="/eden/default/user/login" method="GET" version="1.1"></http>
         </request>
         <request subst="true">  <!-- Hard coded to login as admin@example.com -->
@@ -96,7 +96,7 @@
 <request><http url='/eden/static/img/jquery-ui/calendar.gif' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:55 GMT' method='GET'></http></request>
 <request><http url='/eden/static/img/jquery-ui/ui-bg_highlight-soft_100_eeeeee_1x100.png' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:55 GMT' method='GET'></http></request>
 
-<request><http url='http://localhost:8000/eden/static/img/gis/openlayers/layer-switcher-minimize.png' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:55 GMT' method='GET'></http></request>
+<request><http url='/eden/static/img/gis/openlayers/layer-switcher-minimize.png' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:55 GMT' method='GET'></http></request>
 <request><http url='/eden/static/themes/IFRC/img/ext/qtip/tip-sprite.gif' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:57 GMT' method='GET'></http></request>
 <request><http url='/eden/static/themes/IFRC/img/ext/qtip/tip-anchor-sprite.gif' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:57 GMT' method='GET'></http></request>
 <request><http url='/eden/static/img/gis/openlayers/layer-switcher-maximize.png' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:55 GMT' method='GET'></http></request>
@@ -124,13 +124,13 @@
 
 <request><http url='/eden/static/img/jquery-ui/ui-bg_highlight-soft_75_ffe45c_1x100.png' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:55 GMT' method='GET'></http></request>
 
-<thinktime random='true' value='71'/>
+<thinktime random='true' value='1'/>
 
 <request><http url='/eden/gis/l0/103' version='1.1' method='GET'></http></request>
 
 
 <!-- The Following simulate random searches of the DB -->
-<thinktime random='true' value='166'/>
+<thinktime random='true' value='1'/>
 
 <request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L1&amp;parent=103&amp;term=AP' version='1.1' method='GET'></http></request>
 
@@ -166,7 +166,7 @@
 <!-- New Volunteers get added here -->
 <request>
             <!-- Collect the formkey from the registration form (not the sign-in form!) -->
-    <dyn_variable name="_formkey" xpath="//input[@name='_fromkey'][1]/@value" />
+    <dyn_variable name="_formkey" xpath="//input[@name='_formkey'][1]/@value" />
     <http url="/eden/vol/volunteer" method="GET" version="1.1"></http>
 </request>
 
@@ -197,11 +197,10 @@
 			<var name="gis_location_L4"/>
 			<var name="gis_location_lat"/>
 			<var name="gis_location_lon"/>
-			<var name="formname"/>
 			<var name="utc_offset"/>
         </setdynvars>
- <request>       
-<http url='/eden/vol/volunteer' version='1.1' content_type='application/x-www-form-urlencoded' method='POST' contents='_formkey=%%__formkey%%&amp;organisation_id=%%_organisation_id%%&amp;first_name=%%_first_name%%&amp;middle_name=%%_middle_name%%&amp;last_name=%%_last_name%%&amp;date_of_birth=%%_date_of_birth%%&amp;gender=%%_gender%%&amp;email=%%_email%%&amp;mobile_phone=%%_mobile_phone%%&amp;programme_id=%%_programme_id%%&amp;job_title_id=%%_job_title_id%%&amp;start_date=%%_start_date%%&amp;end_date=%%_end_date%%&amp;location_id=%%_location_id%%&amp;gis_location_L0=%%_gis_location_L0%%&amp;gis_location_name=%%_gis_location_name%%&amp;gis_location_street=%%_gis_location_street%%&amp;gis_location_postcode=%%_gis_location_postcode%%&amp;gis_location_L1=%%_gis_location_L1%%&amp;gis_location_L2=%%_gis_location_L2%%&amp;gis_location_L3=%%_gis_location_L3%%&amp;gis_location_L4=%%_gis_location_L4%%&amp;gis_location_lat=%%_gis_location_lat%%&amp;gis_location_lon=%%_gis_location_lon%%&amp;_formname=%%_formname%%&amp;_utc_offset=%%_utc_offset%%'>
+ <request subst="true">       
+<http url='/eden/vol/volunteer' version='1.1' content_type='application/x-www-form-urlencoded' method='POST' contents='_formkey=%%__formkey%%&amp;organisation_id=%%_organisation_id%%&amp;first_name=%%_first_name%%&amp;middle_name=%%_middle_name%%&amp;last_name=%%_last_name%%&amp;date_of_birth=%%_date_of_birth%%&amp;gender=%%_gender%%&amp;email=%%_email%%&amp;mobile_phone=%%_mobile_phone%%&amp;programme_id=%%_programme_id%%&amp;job_title_id=%%_job_title_id%%&amp;start_date=%%_start_date%%&amp;end_date=%%_end_date%%&amp;location_id=%%_location_id%%&amp;gis_location_L0=%%_gis_location_L0%%&amp;gis_location_name=%%_gis_location_name%%&amp;gis_location_street=%%_gis_location_street%%&amp;gis_location_postcode=%%_gis_location_postcode%%&amp;gis_location_L1=%%_gis_location_L1%%&amp;gis_location_L2=%%_gis_location_L2%%&amp;gis_location_L3=%%_gis_location_L3%%&amp;gis_location_L4=%%_gis_location_L4%%&amp;gis_location_lat=%%_gis_location_lat%%&amp;gis_location_lon=%%_gis_location_lon%%&amp;_formname=hrm_human_resource/None%%&amp;_utc_offset=%%_utc_offset%%'>
 
 </http>
 

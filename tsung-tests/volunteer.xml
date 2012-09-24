@@ -33,7 +33,7 @@
 <!-- Visit Login page -->
         <request>
             <!-- Collect the formkey from the registration form (not the sign-in form!) -->
-            <dyn_variable name="_formkey" xpath="//input[@name='_fromkey'][1]/@value" />
+            <dyn_variable name="_formkey" xpath="//input[@name='_formkey'][1]/@value" />
             <http url="/ifrc/default/user/login" method="GET" version="1.1"></http>
         </request>
         <request subst="true">  <!-- Hard coded to login as test@example.com -->
