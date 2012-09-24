@@ -9,7 +9,7 @@
   
   <!-- Server side setup -->
 <servers>
-  <server host="localhost" port="8000" type="tcp"></server>
+  <server host="targetmachine" port="80" type="tcp"></server>
 </servers>
 
  <load duration="5" unit="minute">
@@ -29,7 +29,7 @@
 
 <sessions>
 <session name='add-volunteer' probability='100'  type='ts_http'>
-<request><http url='http://localhost:8000/eden' version='1.1' method='GET'></http></request>
+<request><http url='http://targetmachine/eden' version='1.1' method='GET'></http></request>
 
 <request><http url='/eden/static/themes/IFRC/ext-theme.min.css' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:56 GMT' method='GET'></http></request>
 <request><http url='/eden/static/themes/IFRC/eden.min.css' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:56 GMT' method='GET'></http></request>

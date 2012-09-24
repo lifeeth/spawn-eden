@@ -15,8 +15,8 @@ try:
 except Exception as e:
     print "Install boto for EC2 support"
 
-branch = "git://github.com/flavour/eden.git"
-template = "default"
+branch = "git://github.com/flavour/ifrc.git"
+template = "IFRC"
 
 def init_env():
     """Initializes the Debian env to work with Cuisine."""
@@ -266,7 +266,7 @@ def configure_eden_standalone(start_eden = True):
     run('sed -i "s|#settings.base.public_url|settings.base.public_url|" /home/web2py/applications/eden/models/000_config.py')
     run('sed -i "s|127.0.0.1:8000|'+hostname+'.'+domain+'|" /home/web2py/applications/eden/models/000_config.py')
     run('sed -i "s|#settings.base.cdn|settings.base.cdn|" /home/web2py/applications/eden/models/000_config.py')
-    run('sed -i "s|settings.base.template = \"default\"|settings.base.template = "'+template+'"|" /home/web2py/applications/eden/models/000_config.py')
+    run('sed -i \'s|settings.base.template = "default"|settings.base.template = "'+template+'"|\' /home/web2py/applications/eden/models/000_config.py')
 
     # Configure Database
     run('sed -i \'s|#settings.database.db_type = "postgres"|settings.database.db_type = "postgres"|\' /home/web2py/applications/eden/models/000_config.py')
@@ -292,16 +292,16 @@ def configure_eden_standalone(start_eden = True):
     if start_eden:
         run('/etc/init.d/uwsgi start')
         run('/etc/init.d/cherokee start')
-    
-    time.sleep(3)
+        run('w')
 
     print "Done."
 
-def run_tsung(xml, target, run_name=''):
+def run_tsung(xml, target, additional_file, run_name=''):
     """Runs tsung tests with a given xml against the given target - Replaces localhost in the xml with the target and fetches the reports dir.
 
     :param xml: The path to the xml file to upload.
     :param target: The machine to run the test against.
+    :param additional_file: The path to additional file to upload.
     :param run_name: Prepend the log directory of tsung with this.
     :returns: A tar.gz of the logs directory.
     
@@ -309,10 +309,11 @@ def run_tsung(xml, target, run_name=''):
 
     .. code-block:: sh 
     
-        fab -i awskey.pem -u root -H machine_with_tsung run_tsung:xml=tsung-tests/test.xml,target=machine_to_test_against
+        fab -i awskey.pem -u root -H machine_with_tsung run_tsung:xml=tsung-tests/test.xml,target=machine_to_test_against,additional_file=tsung-tests/test.csv
 
     """
     put(xml,'current_test.xml')
+    put(additional_file,'.')
     run("sed -i 's|targetmachine|"+target+"|' current_test.xml")
     from time import gmtime, strftime
     logdir = run_name+strftime("%Y%m%d%H%M%S",gmtime())
