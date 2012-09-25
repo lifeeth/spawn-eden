@@ -120,8 +120,6 @@
 <request><http url='/eden/static/img/jquery-ui/ui-icons_ffffff_256x240.png' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:55 GMT' method='GET'></http></request>
 <request><http url='/eden/static/img/jquery-ui/ui-bg_glass_100_f6f6f6_1x400.png' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:55 GMT' method='GET'></http></request>
 
-<thinktime random='true' value='36'/>
-
 <request><http url='/eden/static/img/jquery-ui/ui-bg_highlight-soft_75_ffe45c_1x100.png' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:55 GMT' method='GET'></http></request>
 
 <thinktime random='true' value='1'/>
