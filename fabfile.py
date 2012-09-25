@@ -296,7 +296,7 @@ def configure_eden_standalone(start_eden = True):
 
     print "Done."
 
-def run_tsung(xml, target, additional_file, run_name=''):
+def run_tsung(xml, target, additional_file='', run_name=''):
     """Runs tsung tests with a given xml against the given target - Replaces localhost in the xml with the target and fetches the reports dir.
 
     :param xml: The path to the xml file to upload.
@@ -313,7 +313,8 @@ def run_tsung(xml, target, additional_file, run_name=''):
 
     """
     put(xml,'current_test.xml')
-    put(additional_file,'.')
+    if additional_file:
+        put(additional_file,'.')
     run("sed -i 's|targetmachine|"+target+"|' current_test.xml")
     from time import gmtime, strftime
     logdir = run_name+strftime("%Y%m%d%H%M%S",gmtime())
