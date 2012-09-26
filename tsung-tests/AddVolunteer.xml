@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE tsung SYSTEM "/opt/local/share/tsung/tsung-1.0.dtd">
-<tsung loglevel="debug" version="1.0">
+<tsung loglevel="debug" dumptraffic="true" version="1.0">
 
   <!-- Client side setup -->
   <clients>
@@ -13,14 +13,14 @@
 </servers>
 
  <load duration="5" unit="minute">
-   <arrivalphase phase="1" duration="1" unit="minute">
-     <users maxnumber="1" arrivalrate="1" unit="second"></users>
+   <arrivalphase phase="1" duration="5" unit="minute">
+     <users maxnumber="5" arrivalrate="60" unit="second"></users>
    </arrivalphase>
   </load>
 
   <options>
      <option name="file_server" id='newvolunteers' value="volunteers.csv"/>
-   <option type="ts_http" name="user_agent">
+     <option type="ts_http" name="user_agent">
     <user_agent probability="80">Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.7.8) Gecko/20050513 Galeon/1.3.21</user_agent>
     <user_agent probability="20">Mozilla/5.0 (Windows; U; Windows NT 5.2; fr-FR; rv:1.7.8) Gecko/20050511 Firefox/1.0.4</user_agent>
    </option>
@@ -63,6 +63,7 @@
 
 
 <thinktime random='true' value='1'/>
+<transaction name="login">
 
 <!-- Visit Login page -->
         <request>
@@ -74,7 +75,7 @@
             <http url="/eden/default/user/login" method="POST" version="1.1" content_type='application/x-www-form-urlencoded' contents="_formname=login&amp;_formkey=%%__formkey%%&amp;email=admin@example.com&amp;password=testing&amp;_next=/eden/default/index&amp;_utc_offset=-330">
             </http>
         </request>
-
+</transaction>
 <thinktime random='true' value='2'/>
 
 <request><http url='/eden/static/img/dialog-confirmation.png' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:54 GMT' method='GET'></http></request>
@@ -162,6 +163,8 @@
 
 
 <!-- New Volunteers get added here -->
+<transaction name="add_volunteer">
+
 <request>
             <!-- Collect the formkey from the registration form (not the sign-in form!) -->
     <dyn_variable name="_formkey" xpath="//input[@name='_formkey'][1]/@value" />
@@ -197,12 +200,13 @@
 			<var name="gis_location_lon"/>
 			<var name="utc_offset"/>
         </setdynvars>
+        
  <request subst="true">       
 <http url='/eden/vol/volunteer' version='1.1' content_type='application/x-www-form-urlencoded' method='POST' contents='_formkey=%%__formkey%%&amp;organisation_id=%%_organisation_id%%&amp;first_name=%%_first_name%%&amp;middle_name=%%_middle_name%%&amp;last_name=%%_last_name%%&amp;date_of_birth=%%_date_of_birth%%&amp;gender=%%_gender%%&amp;email=%%_email%%&amp;mobile_phone=%%_mobile_phone%%&amp;programme_id=%%_programme_id%%&amp;job_title_id=%%_job_title_id%%&amp;start_date=%%_start_date%%&amp;end_date=%%_end_date%%&amp;location_id=%%_location_id%%&amp;gis_location_L0=%%_gis_location_L0%%&amp;gis_location_name=%%_gis_location_name%%&amp;gis_location_street=%%_gis_location_street%%&amp;gis_location_postcode=%%_gis_location_postcode%%&amp;gis_location_L1=%%_gis_location_L1%%&amp;gis_location_L2=%%_gis_location_L2%%&amp;gis_location_L3=%%_gis_location_L3%%&amp;gis_location_L4=%%_gis_location_L4%%&amp;gis_location_lat=%%_gis_location_lat%%&amp;gis_location_lon=%%_gis_location_lon%%&amp;_formname=hrm_human_resource/None%%&amp;_utc_offset=%%_utc_offset%%'>
 
 </http>
-
 </request>
+</transaction>
 
 </session>
 
