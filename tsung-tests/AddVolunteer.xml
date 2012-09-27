@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE tsung SYSTEM "/opt/local/share/tsung/tsung-1.0.dtd">
-<tsung loglevel="debug" dumptraffic="true" version="1.0">
+<tsung loglevel="debug" version="1.0">
 
   <!-- Client side setup -->
   <clients>
@@ -12,9 +12,9 @@
   <server host="targetmachine" port="80" type="tcp"></server>
 </servers>
 
- <load duration="5" unit="minute">
-   <arrivalphase phase="1" duration="5" unit="minute">
-     <users maxnumber="5" arrivalrate="60" unit="second"></users>
+ <load duration="6" unit="minute">
+   <arrivalphase phase="1" duration="6" unit="minute">
+     <users maxnumber="100" arrivalrate="1" unit="second"></users>
    </arrivalphase>
   </load>
 
@@ -163,14 +163,16 @@
 
 
 <!-- New Volunteers get added here -->
-<transaction name="add_volunteer">
+<transaction name="get_volunteer">
 
 <request>
             <!-- Collect the formkey from the registration form (not the sign-in form!) -->
     <dyn_variable name="_formkey" xpath="//input[@name='_formkey'][1]/@value" />
     <http url="/eden/vol/volunteer" method="GET" version="1.1"></http>
 </request>
+</transaction>
 
+<transaction name="add_volunteer">
 
         <!-- fetch volunteer data -->
         <setdynvars sourcetype="file" fileid="newvolunteers" delimiter="," order="iter">
