@@ -46,9 +46,8 @@
 
 <sessions>
 <session name='add-volunteer' probability='100'  type='ts_http'>
-<request><http url='http://targetmachine/eden' version='1.1' method='GET'></http></request>
 
-<request><http url='/eden/static/themes/IFRC/ext-theme.min.css' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:56 GMT' method='GET'></http></request>
+<request><http url='http://targetmachine/eden/static/themes/IFRC/ext-theme.min.css' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:56 GMT' method='GET'></http></request>
 <request><http url='/eden/static/themes/IFRC/eden.min.css' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:56 GMT' method='GET'></http></request>
 <request><http url='/eden/static/scripts/jquery-1.7.2.min.js' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:56 GMT' method='GET'></http></request>
 <request><http url='/eden/static/scripts/ext/adapter/jquery/ext-jquery-adapter.js' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:55 GMT' method='GET'></http></request>
@@ -79,25 +78,8 @@
 <request><http url='/eden/static/img/jquery-ui/ui-anim_basic_16x16.gif' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:55 GMT' method='GET'></http></request>
 
 
-<thinktime random='true' value='1'/>
-<transaction name="login">
-
-<!-- Visit Login page -->
-        <request>
-            <!-- Collect the formkey from the registration form (not the sign-in form!) -->
-            <dyn_variable name="_formkey" xpath="//input[@name='_formkey'][1]/@value" />
-            <http url="/eden/default/user/login" method="GET" version="1.1"></http>
-        </request>
-        <request subst="true">  <!-- Hard coded to login as admin@example.com -->
-            <http url="/eden/default/user/login" method="POST" version="1.1" content_type='application/x-www-form-urlencoded' contents="_formname=login&amp;_formkey=%%__formkey%%&amp;email=admin@example.com&amp;password=testing&amp;_next=/eden/default/index&amp;_utc_offset=-330">
-            </http>
-        </request>
-</transaction>
-<thinktime random='true' value='2'/>
-
 <request><http url='/eden/static/img/dialog-confirmation.png' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:54 GMT' method='GET'></http></request>
 
-<thinktime random='true' value='2'/>
 
 <request><http url='/eden/static/img/ajax-loader.gif' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:54 GMT' method='GET'></http></request>
 <request><http url='/eden/static/scripts/yepnope.1.5.4-min.js' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:56 GMT' method='GET'></http></request>
@@ -119,20 +101,13 @@
 <request><http url='/eden/static/themes/IFRC/img/ext/qtip/tip-anchor-sprite.gif' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:57 GMT' method='GET'></http></request>
 <request><http url='/eden/static/img/gis/openlayers/layer-switcher-maximize.png' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:55 GMT' method='GET'></http></request>
 
-<thinktime random='true' value='2'/>
 
 <request><http url='/eden/static/img/help_off.gif' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:55 GMT' method='GET'></http></request>
 <request><http url='/eden/static/img/jquery-ui/ui-icons_222222_256x240.png' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:55 GMT' method='GET'></http></request>
 
-<thinktime random='true' value='18'/>
-
-<request><http url='/eden/org/org_search/search.json?filter=%7E&amp;term=red' version='1.1' method='GET'></http></request>
-
-<thinktime random='true' value='3'/>
 
 <request><http url='/eden/static/img/jquery-ui/ui-bg_glass_100_fdf5ce_1x400.png' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:55 GMT' method='GET'></http></request>
 
-<thinktime random='true' value='15'/>
 
 <request><http url='/eden/static/img/jquery-ui/ui-bg_gloss-wave_35_f6a828_500x100.png' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:55 GMT' method='GET'></http></request>
 <request><http url='/eden/static/img/jquery-ui/ui-icons_ffffff_256x240.png' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:55 GMT' method='GET'></http></request>
@@ -140,92 +115,6 @@
 
 <request><http url='/eden/static/img/jquery-ui/ui-bg_highlight-soft_75_ffe45c_1x100.png' version='1.1' if_modified_since='Fri, 14 Sep 2012 15:58:55 GMT' method='GET'></http></request>
 
-<thinktime random='true' value='1'/>
-
-<request><http url='/eden/gis/l0/103' version='1.1' method='GET'></http></request>
-
-
-<!-- The Following simulate random searches of the DB -->
-<thinktime random='true' value='1'/>
-
-<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L1&amp;parent=103&amp;term=AP' version='1.1' method='GET'></http></request>
-
-<thinktime random='true' value='2'/>
-
-<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L1&amp;parent=103&amp;term=An' version='1.1' method='GET'></http></request>
-<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L1&amp;parent=103&amp;term=And' version='1.1' method='GET'></http></request>
-<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L1&amp;parent=103&amp;term=Andh' version='1.1' method='GET'></http></request>
-<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L1&amp;parent=103&amp;term=Andhra' version='1.1' method='GET'></http></request>
-
-<thinktime random='true' value='3'/>
-
-<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L1&amp;parent=103&amp;term=Andh' version='1.1' method='GET'></http></request>
-<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L1&amp;parent=103&amp;term=An' version='1.1' method='GET'></http></request>
-<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L1&amp;parent=103&amp;term=Ka' version='1.1' method='GET'></http></request>
-<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L1&amp;parent=103&amp;term=Karna' version='1.1' method='GET'></http></request>
-<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L1&amp;parent=103&amp;term=Karnat' version='1.1' method='GET'></http></request>
-<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L1&amp;parent=103&amp;term=Karnatak' version='1.1' method='GET'></http></request>
-<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L1&amp;parent=103&amp;term=Karnataka' version='1.1' method='GET'></http></request>
-
-<thinktime random='true' value='4'/>
-
-<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L3&amp;term=Ban' version='1.1' method='GET'></http></request>
-<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L3&amp;term=Bang' version='1.1' method='GET'></http></request>
-<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L3&amp;term=Banga' version='1.1' method='GET'></http></request>
-<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L3&amp;term=Bangal' version='1.1' method='GET'></http></request>
-<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L3&amp;term=Bangalo' version='1.1' method='GET'></http></request>
-<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L3&amp;term=Bangalore' version='1.1' method='GET'></http></request>
-
-<thinktime random='true' value='6'/>
-
-
-<!-- New Volunteers get added here -->
-<transaction name="get_volunteer_form">
-
-<request>
-            <!-- Collect the formkey from the registration form (not the sign-in form!) -->
-    <dyn_variable name="_formkey" xpath="//input[@name='_formkey'][1]/@value" />
-    <http url="/eden/vol/volunteer/create" method="GET" version="1.1"></http>
-</request>
-</transaction>
-
-<transaction name="add_volunteer">
-
-        <!-- fetch volunteer data -->
-        <setdynvars sourcetype="file" fileid="newvolunteers" delimiter="," order="iter">
-            <var name="organisation_id"/>
-			<var name="person_id"/>
-			<var name="first_name"/>
-			<var name="middle_name"/>
-			<var name="last_name"/>
-			<var name="date_of_birth"/>
-			<var name="gender"/>
-			<var name="email"/>
-			<var name="mobile_phone"/>
-			<var name="programme_id"/>
-			<var name="job_title_id"/>
-			<var name="start_date"/>
-			<var name="end_date"/>
-			<var name="location_id"/>
-			<var name="gis_location_L0"/>
-			<var name="gis_location_name"/>
-			<var name="gis_location_street"/>
-			<var name="gis_location_postcode"/>
-			<var name="gis_location_L1"/>
-			<var name="gis_location_L2"/>
-			<var name="gis_location_L3"/>
-			<var name="gis_location_L4"/>
-			<var name="gis_location_lat"/>
-			<var name="gis_location_lon"/>
-			<var name="utc_offset"/>
-        </setdynvars>
-        
- <request subst="true">       
-<http url='/eden/vol/volunteer/create' version='1.1' content_type='application/x-www-form-urlencoded' method='POST' contents='_formkey=%%__formkey%%&amp;organisation_id=%%_organisation_id%%&amp;first_name=%%_first_name%%&amp;middle_name=%%_middle_name%%&amp;last_name=%%_last_name%%&amp;date_of_birth=%%_date_of_birth%%&amp;gender=%%_gender%%&amp;email=%%_email%%&amp;mobile_phone=%%_mobile_phone%%&amp;programme_id=%%_programme_id%%&amp;job_title_id=%%_job_title_id%%&amp;start_date=%%_start_date%%&amp;end_date=%%_end_date%%&amp;location_id=%%_location_id%%&amp;gis_location_L0=%%_gis_location_L0%%&amp;gis_location_name=%%_gis_location_name%%&amp;gis_location_street=%%_gis_location_street%%&amp;gis_location_postcode=%%_gis_location_postcode%%&amp;gis_location_L1=%%_gis_location_L1%%&amp;gis_location_L2=%%_gis_location_L2%%&amp;gis_location_L3=%%_gis_location_L3%%&amp;gis_location_L4=%%_gis_location_L4%%&amp;gis_location_lat=%%_gis_location_lat%%&amp;gis_location_lon=%%_gis_location_lon%%&amp;_formname=hrm_human_resource/None%%&amp;_utc_offset=%%_utc_offset%%'>
-
-</http>
-</request>
-</transaction>
 
 </session>
 

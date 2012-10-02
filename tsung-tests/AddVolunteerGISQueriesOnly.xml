@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<!DOCTYPE tsung SYSTEM "/opt/local/share/tsung/tsung-1.0.dtd">
+<tsung loglevel="debug" version="1.0">
+
+  <!-- Client side setup -->
+  <clients>
+    <client host="localhost" use_controller_vm="true"/>
+  </clients>
+  
+  <!-- Server side setup -->
+<servers>
+  <server host="targetmachine" port="80" type="tcp"></server>
+</servers>
+
+  <monitoring>
+    <monitor host="targetmachine" type="snmp"></monitor>
+  </monitoring>
+
+ <load duration="62" unit="minute">
+   <arrivalphase phase="1" duration="1" unit="minute">
+     <users maxnumber="25" arrivalrate="1" unit="second"></users>
+   </arrivalphase>
+    <arrivalphase phase="2" duration="3" unit="minute">
+     <users maxnumber="50" arrivalrate="2" unit="second"></users>
+   </arrivalphase>
+   <arrivalphase phase="3" duration="6" unit="minute">
+     <users maxnumber="100" arrivalrate="2" unit="second"></users>
+   </arrivalphase>
+   <arrivalphase phase="4" duration="12" unit="minute">
+     <users maxnumber="200" arrivalrate="2" unit="second"></users>
+   </arrivalphase>
+   <arrivalphase phase="5" duration="36" unit="minute">
+     <users maxnumber="400" arrivalrate="2" unit="second"></users>
+   </arrivalphase>
+  </load>
+
+  <options>
+     <option name="file_server" id='newvolunteers' value="volunteers.csv"/>
+     <option type="ts_http" name="user_agent">
+    <user_agent probability="80">Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.7.8) Gecko/20050513 Galeon/1.3.21</user_agent>
+    <user_agent probability="20">Mozilla/5.0 (Windows; U; Windows NT 5.2; fr-FR; rv:1.7.8) Gecko/20050511 Firefox/1.0.4</user_agent>
+   </option>
+  </options>
+  
+
+
+<sessions>
+<session name='add-volunteer' probability='100'  type='ts_http'>
+
+
+<request><http url='http://targetmachine/eden' version='1.1' method='GET'></http></request>
+
+<transaction name="login">
+
+<!-- Visit Login page -->
+        <request>
+            <!-- Collect the formkey from the registration form (not the sign-in form!) -->
+            <dyn_variable name="_formkey" xpath="//input[@name='_formkey'][1]/@value" />
+            <http url="/eden/default/user/login" method="GET" version="1.1"></http>
+        </request>
+        <request subst="true">  <!-- Hard coded to login as admin@example.com -->
+            <http url="/eden/default/user/login" method="POST" version="1.1" content_type='application/x-www-form-urlencoded' contents="_formname=login&amp;_formkey=%%__formkey%%&amp;email=admin@example.com&amp;password=testing&amp;_next=/eden/default/index&amp;_utc_offset=-330">
+            </http>
+        </request>
+</transaction>
+
+<request><http url='/eden/org/org_search/search.json?filter=%7E&amp;term=red' version='1.1' method='GET'></http></request>
+
+<request><http url='/eden/gis/l0/103' version='1.1' method='GET'></http></request>
+
+<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L1&amp;parent=103&amp;term=AP' version='1.1' method='GET'></http></request>
+
+
+<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L1&amp;parent=103&amp;term=An' version='1.1' method='GET'></http></request>
+<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L1&amp;parent=103&amp;term=And' version='1.1' method='GET'></http></request>
+<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L1&amp;parent=103&amp;term=Andh' version='1.1' method='GET'></http></request>
+<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L1&amp;parent=103&amp;term=Andhra' version='1.1' method='GET'></http></request>
+
+
+<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L1&amp;parent=103&amp;term=Andh' version='1.1' method='GET'></http></request>
+<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L1&amp;parent=103&amp;term=An' version='1.1' method='GET'></http></request>
+<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L1&amp;parent=103&amp;term=Ka' version='1.1' method='GET'></http></request>
+<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L1&amp;parent=103&amp;term=Karna' version='1.1' method='GET'></http></request>
+<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L1&amp;parent=103&amp;term=Karnat' version='1.1' method='GET'></http></request>
+<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L1&amp;parent=103&amp;term=Karnatak' version='1.1' method='GET'></http></request>
+<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L1&amp;parent=103&amp;term=Karnataka' version='1.1' method='GET'></http></request>
+<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L3&amp;term=Ban' version='1.1' method='GET'></http></request>
+<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L3&amp;term=Bang' version='1.1' method='GET'></http></request>
+<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L3&amp;term=Banga' version='1.1' method='GET'></http></request>
+<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L3&amp;term=Bangal' version='1.1' method='GET'></http></request>
+<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L3&amp;term=Bangalo' version='1.1' method='GET'></http></request>
+<request><http url='/eden/gis/location/search.json?filter=~&amp;field=name&amp;level=L3&amp;term=Bangalore' version='1.1' method='GET'></http></request>
+
+
+</session>
+
+</sessions>
+</tsung>
